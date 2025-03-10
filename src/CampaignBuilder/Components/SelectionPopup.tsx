@@ -1,69 +1,130 @@
 import { Image, Text, Button, Card, CardBody, CardFooter, CardHeader, Heading, SimpleGrid, Center, border, Divider, Flex, Popover, useBoolean } from "@chakra-ui/react";
-import React, { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import SelectDropdown from "../../components/SelectDropdown";
+import { useReactFlow } from "@xyflow/react";
+import { nanoid } from "nanoid";
 
-const SelectionPopup = () => {
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
+const SelectionPopup = ({ closeModal, type, parentNodeId = '', parentPosition }: any) => {
+    const rootRef = useRef(null);
+    const [selectedType, setSelectedType] = useState('')
+    const { setNodes, setEdges } = useReactFlow()
+    const [blocks, setBlocks] = useState([
+        {
+            buttonText: 'Select',
+            title: 'Action',
+            type: 'action',
+            description: 'An action is something executed by Vinmax (e.g. send an email).',
+            color: '#e90010'
+        },
+        {
+            buttonText: 'Select',
+            title: 'Condition',
+            type: 'condition',
+            description: 'A condition is based on known profile field values or submitted form data.',
+            color: '#f3533e'
+        },
+    ])
 
-    const togglePopup = () => {
-        setIsPopupOpen(!isPopupOpen);
-    };
-
-    const handleOutsideClick = (event: React.MouseEvent<HTMLDivElement>) => {
-        if ((event.target as HTMLDivElement).id === "popup-overlay") {
-            togglePopup();
+    useEffect(() => {
+        if (['action', 'condition'].includes(type) || !type) {
+            setBlocks([
+                {
+                    buttonText: 'Select',
+                    title: 'Decision',
+                    type: 'decision',
+                    description: 'A decision is a condition that splits the flow of the campaign based on the profile field values or submitted form data.',
+                    color: '#00B49C'
+                },
+                {
+                    buttonText: 'Select',
+                    title: 'Action',
+                    type: 'action',
+                    description: 'An action is something executed by Vinmax (e.g. send an email).',
+                    color: '#e90010'
+                },
+                {
+                    buttonText: 'Select',
+                    title: 'Condition',
+                    type: 'condition',
+                    description: 'A condition is based on known profile field values or submitted form data.',
+                    color: '#f3533e'
+                },
+            ])
         }
-    };
+    }, [type])
+
+
+
+    const onChangeHandler = (event: any) => {
+        const id = nanoid();
+        setNodes((prevNodes) => [
+            ...prevNodes,
+            {
+                parentId: parentNodeId,
+                id: nanoid(),
+                type: "text",
+                connectable: true,
+                position: {
+                    x: parentPosition.x,
+                    y: parentPosition.y,
+                },
+                data: {
+                    label: event.target.value,
+                    type: selectedType
+                },
+            },
+        ]);
+
+        setEdges((prevEdges) => [
+            ...prevEdges,
+            {
+                id: `e${parentNodeId}-${id}`,
+                source: parentNodeId,
+                target: id,
+                type: 'smoothstep',
+                zIndex: 11,
+                animated: true,
+                labelBgStyle: { fill: '#fff', fillOpacity: 0.7 },
+                labelBgPadding: [2, 4],
+                labelBgBorderRadius: 4,
+            },
+        ]);
+        closeModal();
+    }
+
+
 
     return (
-        <SimpleGrid spacing={ 4 } justifyContent="center" display="flex" templateColumns="repeat(3, minmax(200px, 1fr))">
-            <Card width="250px">
-                <CardHeader style={ { background: "#15a78a" } }>
-                    <Flex justify="space-between" align="center">
-                        <Heading size='md' color={ "white" } display="flex" alignItems="center"> Decision</Heading>
-                        <Image src="https://via.placeholder.com/25" display="flex" alignItems="center" />
-                    </Flex>
-                </CardHeader>
-                <CardBody>
-                    <Text>An action is something executed by Vinmax (e.g. send an email)</Text>
-                </CardBody>
-                <Divider color={ "#e6e9ed" } />
-                <CardFooter justifyContent="center" display="flex">
-                    <Button>Select</Button>
-                </CardFooter>
-            </Card>
-            <Card width="250px">
-                <CardHeader style={ { background: "#e90010" } }>
-                    <Flex justify="space-between" align="center">
-                        <Heading size='md' color={ "white" } display="flex" alignItems="center"> Action</Heading>
-                        <Image src="https://via.placeholder.com/25" display="flex" alignItems="center" />
-                    </Flex>
-                </CardHeader>
-                <CardBody>
-                    <Text>An action is something executed by Vinmax (e.g. send an email).</Text>
-                </CardBody>
-                <Divider color={ "#e6e9ed" } />
-                <CardFooter justifyContent="center" display="flex">
-                    <Button>Select</Button>
-                </CardFooter>
-            </Card>
-            <Card width="250px">
-                <CardHeader style={ { background: "#f3533e" } }>
-                    <Flex justify="space-between" align="center">
-                        <Heading size='md' color={ "white" } display="flex" alignItems="center"> Condition</Heading>
-                        <Image src="https://via.placeholder.com/25" display="flex" alignItems="center" />
-                    </Flex>
-                </CardHeader>
-                <CardBody>
-                    <Text>A condition is based on known profile field values or submitted form data.</Text>
-                </CardBody>
-                <Divider color={ "#e6e9ed" } />
-
-                <CardFooter justifyContent="center" display="flex">
-                    <Button >Select</Button>
-                </CardFooter>
-            </Card>
-        </SimpleGrid>
-
+        <div style={{
+            top: "calc(100% + 20px)",
+            position: "absolute",
+            zIndex: 1000,
+        }}>
+            {
+                selectedType ? (
+                    <SelectDropdown onChange={onChangeHandler} />
+                ) : (
+                    <SimpleGrid ref={rootRef} spacing={4} justifyContent="center" display="flex" templateColumns="repeat(3, minmax(200px, 1fr))">
+                        <button onClick={closeModal}>close</button>
+                        {
+                            blocks.map((block, index) => (
+                                <Card key={index} maxW="sm" borderWidth="1px" borderRadius="lg" borderColor={block.color} style={{ cursor: 'pointer', width: "250px" }}>
+                                    <CardHeader style={{ background: block.color, color: 'white' }}>
+                                        <Heading as="h3" size="md">{block.title}</Heading>
+                                    </CardHeader>
+                                    <CardBody>
+                                        <Text>{block.description}</Text>
+                                    </CardBody>
+                                    <CardFooter>
+                                        <Button onClick={() => setSelectedType(block.type)} colorScheme="blue">{block.buttonText}</Button>
+                                    </CardFooter>
+                                </Card>
+                            ))
+                        }
+                    </SimpleGrid>
+                )
+            }
+        </div>
     );
 };
 
