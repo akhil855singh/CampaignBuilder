@@ -46,7 +46,7 @@ function ContactSourceView() {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
             setShowInputView(false);
         }
-    }
+    } 
 
     <div
         onClick={ handleClickOutside }
