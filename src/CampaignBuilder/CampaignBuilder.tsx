@@ -1,15 +1,12 @@
 import { ReactFlow, useNodesState, Background, MiniMap, Controls, useEdgesState, addEdge } from '@xyflow/react';
 import { initialNodes, initialEdges } from '../Constants/Constants';
 import { TextNode } from './Components/TextNode';
-import ContactSourceView from './Components/ContactSourceView';
-import SelectionPopup from './Components/SelectionPopup';
 import { useCallback, useMemo, useState } from 'react';
 import '@xyflow/react/dist/style.css';
 import ContactSourceDropdown from './Components/ContactSourceDropdown/ContactSourceDropdown';
-import { ModalView, ButtonActions, ButtonActionType } from './Components/ModalView';
-import { text } from 'framer-motion/client';
-import SelectDropdown from '../components/SelectDropdown';
+import { ModalView, ButtonActions } from './Components/ModalView';
 import CustomEdge from './Components/ButtonEdge';
+import { ActionsModalView } from './Components/ActionsModalView/ActionsModalView';
 
 interface HandleData {
     id: string,
@@ -23,7 +20,7 @@ let nodeType = {
 
 let edgeTypes = {
     button: CustomEdge,
-  };
+};
 
 function CampaignBuilder() {
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
@@ -31,10 +28,8 @@ function CampaignBuilder() {
     const [showSelectedPopup, setShowSelectedPopup] = useState(Boolean)
     const [showContactSourceView, setShowContactSourceView] = useState(true)
     const [showModal, setShowModal] = useState(false)
-    const [lastNodeId, setLastNodeId] = useState("1")
     let handleData: HandleData = { id: "", position: "", coordinate: [0] }
     const [data, setData] = useState(handleData)
-    let nodeId = 1
 
     // ✅ Memoize nodeTypes to avoid re-creation on every render
     const handleHandleClick = useCallback((id: string, position: string, coordinate: number[]) => {
@@ -59,7 +54,7 @@ function CampaignBuilder() {
         button: (props) => <CustomEdge { ...props } />
     }), []);
 
-    const onConnect = useCallback((params:any) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+    const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
     function handleClick(actions: ButtonActionType) {
         switch (actions) {
@@ -81,14 +76,15 @@ function CampaignBuilder() {
         <ReactFlow
             nodes={ nodes }
             edges={ edges }
-            nodeTypes={ nodeType}
+            nodeTypes={ nodeType }
             edgeTypes={ edgeTypes }// not working yet
             onNodesChange={ onNodesChange }
             onEdgesChange={ onEdgesChange }
             onConnect={ onConnect }
-            style={ { background: "#fff", position: "fixed"} }
+            style={ { background: "#fff", position: "fixed" } }
         >
             { showModal && (
+                // <ActionsModalView handleClick={action => handleClick(action)} />
                 <ModalView handleClick={ (action) => handleClick(action) } />
             ) }
             { showContactSourceView && (

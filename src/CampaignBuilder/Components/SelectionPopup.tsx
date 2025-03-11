@@ -1,51 +1,66 @@
-import { Image, Text, Button, Card, CardBody, CardFooter, CardHeader, Heading, SimpleGrid, Center, border, Divider, Flex, Popover, useBoolean } from "@chakra-ui/react";
+import { Text, Button, Card, CardBody, CardFooter, CardHeader, Heading, SimpleGrid, Center, border, Divider, Flex, Popover, useBoolean } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
-import SelectDropdown from "../../components/SelectDropdown";
-import { useReactFlow } from "@xyflow/react";
-import { nanoid } from "nanoid";
+import DropdownView from "./DropdownView";
+import { DropdownType } from "../../Constants/enums";
 
-const SelectionPopup = ({ closeModal, type, parentNodeId = '', parentPosition }: any) => {
+interface Props {
+    parentNodeId: string
+    closeModal: () => void
+    type: DropdownType.ACTION | DropdownType.CONDITION | DropdownType.DECISION
+    parentPosition: {
+        x: number,
+        y: number
+    }
+}
+
+const SelectionPopup = ({ parentNodeId, closeModal, type}: Props) => {
     const rootRef = useRef(null);
-    const [selectedType, setSelectedType] = useState('')
-    const { setNodes, setEdges } = useReactFlow()
+    const [showSelection, setShowSelection] = useState(false)
+    const [selectedType, setSelectedType] = useState({
+        buttonText: "",
+        title: "",
+        type: "",
+        description: "",
+        color: ""
+    })
     const [blocks, setBlocks] = useState([
         {
             buttonText: 'Select',
             title: 'Action',
-            type: 'action',
+            type:  DropdownType.ACTION,
             description: 'An action is something executed by Vinmax (e.g. send an email).',
             color: '#e90010'
         },
         {
             buttonText: 'Select',
             title: 'Condition',
-            type: 'condition',
+            type: DropdownType.CONDITION,
             description: 'A condition is based on known profile field values or submitted form data.',
             color: '#f3533e'
         },
     ])
 
     useEffect(() => {
-        if (['action', 'condition'].includes(type) || !type) {
+        if (DropdownType.ACTION, DropdownType.CONDITION.includes(type) || !type) {
             setBlocks([
                 {
                     buttonText: 'Select',
                     title: 'Decision',
-                    type: 'decision',
+                    type: DropdownType.DECISION,
                     description: 'A decision is a condition that splits the flow of the campaign based on the profile field values or submitted form data.',
-                    color: '#00B49C'
+                    color: '#00B49C',
                 },
                 {
                     buttonText: 'Select',
                     title: 'Action',
-                    type: 'action',
+                    type:  DropdownType.ACTION,
                     description: 'An action is something executed by Vinmax (e.g. send an email).',
                     color: '#e90010'
                 },
                 {
                     buttonText: 'Select',
                     title: 'Condition',
-                    type: 'condition',
+                    type: DropdownType.CONDITION,
                     description: 'A condition is based on known profile field values or submitted form data.',
                     color: '#f3533e'
                 },
@@ -55,44 +70,42 @@ const SelectionPopup = ({ closeModal, type, parentNodeId = '', parentPosition }:
 
 
 
-    const onChangeHandler = (event: any) => {
-        const id = nanoid();
-        setNodes((prevNodes) => [
-            ...prevNodes,
-            {
-                parentId: parentNodeId,
-                id: nanoid(),
-                type: "text",
-                connectable: true,
-                position: {
-                    x: parentPosition.x,
-                    y: parentPosition.y,
-                },
-                data: {
-                    label: event.target.value,
-                    type: selectedType
-                },
-            },
-        ]);
+    // const onChangeHandler = (event: any) => {
+    //     const id = nanoid();
+    //     setNodes((prevNodes) => [
+    //         ...prevNodes,
+    //         {
+    //             parentId: parentNodeId,
+    //             id: nanoid(),
+    //             type: "text",
+    //             connectable: true,
+    //             position: {
+    //                 x: parentPosition.x,
+    //                 y: parentPosition.y,
+    //             },
+    //             data: {
+    //                 label: event.target.value,
+    //                 type: selectedType
+    //             },
+    //         },
+    //     ]);
 
-        setEdges((prevEdges) => [
-            ...prevEdges,
-            {
-                id: `e${parentNodeId}-${id}`,
-                source: parentNodeId,
-                target: id,
-                type: 'smoothstep',
-                zIndex: 11,
-                animated: true,
-                labelBgStyle: { fill: '#fff', fillOpacity: 0.7 },
-                labelBgPadding: [2, 4],
-                labelBgBorderRadius: 4,
-            },
-        ]);
-        closeModal();
-    }
-
-
+    //     setEdges((prevEdges) => [
+    //         ...prevEdges,
+    //         {
+    //             id: `e${parentNodeId}-${id}`,
+    //             source: parentNodeId,
+    //             target: id,
+    //             type: 'smoothstep',
+    //             zIndex: 11,
+    //             animated: true,
+    //             labelBgStyle: { fill: '#fff', fillOpacity: 0.7 },
+    //             labelBgPadding: [2, 4],
+    //             labelBgBorderRadius: 4,
+    //         },
+    //     ]);
+    //     closeModal();
+    // }
 
     return (
         <div style={{
@@ -101,8 +114,9 @@ const SelectionPopup = ({ closeModal, type, parentNodeId = '', parentPosition }:
             zIndex: 1000,
         }}>
             {
-                selectedType ? (
-                    <SelectDropdown onChange={onChangeHandler} />
+                selectedType.buttonText.length > 0 ? (
+                    // <SelectDropdown onChange={onChangeHandler} />
+                    <DropdownView parentId={parentNodeId} dropdownProps={{dropdownType: selectedType.type, dropdownColor: selectedType.color}} openSelection={() => setShowSelection(false)} />
                 ) : (
                     <SimpleGrid ref={rootRef} spacing={4} justifyContent="center" display="flex" templateColumns="repeat(3, minmax(200px, 1fr))">
                         <button onClick={closeModal}>close</button>
@@ -116,7 +130,7 @@ const SelectionPopup = ({ closeModal, type, parentNodeId = '', parentPosition }:
                                         <Text>{block.description}</Text>
                                     </CardBody>
                                     <CardFooter>
-                                        <Button onClick={() => setSelectedType(block.type)} colorScheme="blue">{block.buttonText}</Button>
+                                        <Button onClick={() =>[setSelectedType(block)]} colorScheme="blue">{block.buttonText}</Button>
                                     </CardFooter>
                                 </Card>
                             ))
@@ -128,4 +142,7 @@ const SelectionPopup = ({ closeModal, type, parentNodeId = '', parentPosition }:
     );
 };
 
-export default SelectionPopup;
+export { 
+    SelectionPopup,
+    DropdownType
+}

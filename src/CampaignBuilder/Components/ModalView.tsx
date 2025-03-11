@@ -17,17 +17,10 @@ import {
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { useReactFlow } from "@xyflow/react";
 import { nanoid } from "nanoid";
-
-// enum
-const ButtonActions = Object.freeze({
-    CANCEL: "cancel",
-    ADD: "add",
-});
-
-type ButtonActionType = typeof ButtonActions[keyof typeof ButtonActions];
+import { ButtonActions } from "../../Constants/enums";
 
 interface Props {
-    handleClick: (actions: ButtonActionType) => void
+    handleClick: (actions: ButtonActions) => void
 }
 
 const data = [
@@ -43,9 +36,6 @@ const data = [
 ];
 
 const ModalView = ({ handleClick }: Props) => {
-    const [inputValue, setInputValue] = useState("");
-    const [filteredData, setFilteredData] = useState(data)
-    const [hoveredIndex, setHoveredIndex] = useState(0);
     const { setNodes } = useReactFlow()
     const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
     const segments = ["Segment A", "Segment B", "Segment C", "Segment D"];
@@ -79,7 +69,7 @@ const ModalView = ({ handleClick }: Props) => {
     };
 
     return (
-        <Flex position="relative" justify="center" h="100vh" zIndex={20}>
+        <Flex position="relative" justify="center" h="100vh" zIndex={20} bg="rgba(0, 0, 0, 0.4)">
             <Box bg="white" p="16px" height={260} mt={10} rounded="md" boxShadow="xl" w="700px">
                 {/* Title */}
                 <Text color="gray.900" fontSize="2xl" fontWeight="regular">
@@ -151,4 +141,3 @@ export {
     ModalView,
     ButtonActions
 }
-export type { ButtonActionType };
