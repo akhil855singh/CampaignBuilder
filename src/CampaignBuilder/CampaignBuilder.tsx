@@ -7,6 +7,7 @@ import ContactSourceDropdown from './Components/ContactSourceDropdown/ContactSou
 import { ModalView, ButtonActions } from './Components/ModalView';
 import CustomEdge from './Components/ButtonEdge';
 import { ActionsModalView } from './Components/ActionsModalView/ActionsModalView';
+import { DecisionsModalView } from './Components/DecisionsModalView/DecisionsModalView';
 
 interface HandleData {
     id: string,
@@ -28,6 +29,7 @@ function CampaignBuilder() {
     const [showSelectedPopup, setShowSelectedPopup] = useState(Boolean)
     const [showContactSourceView, setShowContactSourceView] = useState(true)
     const [showModal, setShowModal] = useState(false)
+    const [showSelectionsModal, setShowSelectionsModal] = useState("")
     let handleData: HandleData = { id: "", position: "", coordinate: [0] }
     const [data, setData] = useState(handleData)
 
@@ -47,7 +49,7 @@ function CampaignBuilder() {
 
     // ✅ Memoize nodeTypes to avoid re-creation on every render
     nodeType = useMemo(() => ({
-        text: (props) => <TextNode { ...props } handleHandleClick={ handleHandleClick } />
+        text: (props) => <TextNode { ...props } handleHandleClick={ handleHandleClick } openModal={showSelectionsModals} />
     }), []);
 
     edgeTypes = useMemo(() => ({
@@ -56,7 +58,11 @@ function CampaignBuilder() {
 
     const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
-    function handleClick(actions: ButtonActionType) {
+    function showSelectionsModals(type: string) {
+        setShowSelectionsModal(type)
+    }
+
+    function handleClick(actions: ButtonActions) {
         switch (actions) {
             case ButtonActions.CANCEL:
                 setShowModal(false)
@@ -87,6 +93,9 @@ function CampaignBuilder() {
                 // <ActionsModalView handleClick={action => handleClick(action)} />
                 <ModalView handleClick={ (action) => handleClick(action) } />
             ) }
+            { showSelectionsModal && (
+                <DecisionsModalView popupType={showSelectionsModal}  />
+            )}
             { showContactSourceView && (
                 <ContactSourceDropdown handleItemClick={ handleModalClick } />
             ) }

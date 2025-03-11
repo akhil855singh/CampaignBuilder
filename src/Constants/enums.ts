@@ -1,3 +1,19 @@
+const DecisionsTypes = {
+    DEVICE_VISIT: "Device visit",
+    DOWNLOAD_ASSETS: "Downloads asset",
+    REQUEST_DYNAMIC_CONTENT: "Request dynamic content",
+    SENDS_A_APP_PUSH_MESSAGE: "Sends a apppush message",
+    SENDS_A_RCS_BOT_MESSAGE: "Sends a rcsbot message",
+    SENDS_A_RCS_MESSAGE: "Sends a rcs message",
+    SENDS_A_TEXT_MESSAGE: "Sends a text message",
+    SENDS_A_WEB_PUSH_MESSAGE: "Sends a webpush message",
+    SENDS_A_WHATS_APP_BOT_MESSAGE: "Sends a whatsappbot message",
+    SENDS_A_WHATS_APP_MESSAGE: "Sends a whatsapp message",
+    SUBMITS_FORM: "Submits form",
+    VISITS_A_PAGE: "Visits a page",
+  };
+  
+
 enum ActionsTypes {
     ADD_DO_NOT_CONTACT = "Add Do Not Contact",
     ADD_TO_COMPANY_SCORE = "Add to company's score",
@@ -43,5 +59,6 @@ enum ButtonActions {
 export {
     ActionsTypes,
     DropdownType,
-    ButtonActions
+    ButtonActions,
+    DecisionsTypes
 }

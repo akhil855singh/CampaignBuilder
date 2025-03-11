@@ -12,9 +12,10 @@ interface Props {
     positionAbsoluteX: number
     positionAbsoluteY: number
     handleHandleClick: (nodeId: string, position: string, coordinate: number[]) => void;
+    openModal: (type: string) => void
 }
 
-function TextNode({id, data, setNodes, positionAbsoluteX, positionAbsoluteY}: Props) {
+function TextNode({id, data, setNodes, positionAbsoluteX, positionAbsoluteY, openModal}: Props) {
     const [isHovered, setIsHovered] = useState(false);
     const [isModalActive, setModalActive] = useState(false);
 
@@ -186,6 +187,7 @@ function TextNode({id, data, setNodes, positionAbsoluteX, positionAbsoluteY}: Pr
                         x: positionAbsoluteX,
                         y: positionAbsoluteY
                     } }
+                    openModal={openModal}
                 />
             }
         </div>

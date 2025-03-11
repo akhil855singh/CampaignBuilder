@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { RiCornerRightUpLine } from "react-icons/ri";
 import { contactActions } from "./ActionsModalView/ActionsModaViewModal";
 import { DropdownType } from "./SelectionPopup";
-
+import { contactDecisions } from "./DecisionsModalView/DecisionsModalViewModal";
 
 interface Props {
     parentId: string
@@ -12,12 +12,12 @@ interface Props {
         dropdownType: string
         dropdownColor: string
     }
-    openSelection: () => void
+    openModal: (type: string) => void
 }
 
 let data: string[] = []
 
-function DropdownView({ parentId, dropdownProps, openSelection }: Props) {
+function DropdownView({ parentId, dropdownProps, openModal }: Props) {
     const [showInputView, setShowInputView] = useState(true)
     const [inputValue, setInputValue] = useState("");
     const [filteredData, setFilteredData] = useState(data)
@@ -37,7 +37,7 @@ function DropdownView({ parentId, dropdownProps, openSelection }: Props) {
             setFilteredData(data)
             break
         case DropdownType.DECISION:
-            data = []
+            data = contactDecisions
             setFilteredData(data)
             break
         default:
@@ -140,7 +140,7 @@ function DropdownView({ parentId, dropdownProps, openSelection }: Props) {
                                             marginTop: 10,
                                             background: hoveredIndex === index ? "red" : "",
                                         } }
-                                        onClick={ () => handleItemClick(item) }
+                                        onClick={ () => openModal(item) }
                                         // onClick={() => [handleItemClick(), handleClickedItem(item)]}
                                         onMouseEnter={ () => setHoveredIndex(index) }
                                         onMouseLeave={ () => setHoveredIndex(null) }
