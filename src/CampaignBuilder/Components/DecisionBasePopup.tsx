@@ -68,6 +68,7 @@ const categories = {
     deviceBrands: ["Apple", "Samsung", "OnePlus", "F2 Mobile", "7 Mobile"],
     deviceOS: ["iOS", "Android", "Windows", "AmigaOS", "BlackBerry"],
     assets: ["en_apb.png", "en_SKY_VAULT_SMS.xlsx", "file1.docx", "report.pdf"],
+    limitToPages:["test1","test2","test3","test4"]
   };
  
 
@@ -83,6 +84,7 @@ const DecisionBasePopup = () => {
         deviceBrands: [],
         deviceOS: [],
         assets: [],
+        limitToPages: [],
       });
       
       // Generic function to handle selection
@@ -190,9 +192,7 @@ const DecisionBasePopup = () => {
           && 
           <CustomFormField label="Pattern the reply should match" placeholder=""></CustomFormField>
           }
-         
-         {popupType === DecisionPopupType.VISITS_A_PAGE &&  <CustomFormField label="URL" placeholder=""></CustomFormField>}
-          {popupType === DecisionPopupType.VISITS_A_PAGE && <CustomFormField label="Referrer" placeholder=""></CustomFormField>}
+        
   
           {/* Device Type Selection */}
           { popupType === DecisionPopupType.DEVICE_VISIT
@@ -247,6 +247,23 @@ const DecisionBasePopup = () => {
             showspan= {true}
             />
            }
+
+            {/*Visit to pages Selection */}
+            { popupType === DecisionPopupType.DOWNLOAD_ASSETS
+          &&
+           <MultiSelectField 
+            label="Limit to Pages"
+            categoryKey="limitToPages"
+            selectedItems={selectedItems}
+            handleSelect={handleSelect}
+            handleRemove={handleRemove}
+            options={categories.limitToPages}
+            showspan= {false}
+            />
+           }
+            {popupType === DecisionPopupType.VISITS_A_PAGE &&  <CustomFormField label="URL" placeholder=""></CustomFormField>}
+          {popupType === DecisionPopupType.VISITS_A_PAGE && <CustomFormField label="Referrer" placeholder=""></CustomFormField>}
+
 
   
           {/* Action Buttons */}
