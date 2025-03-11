@@ -198,7 +198,7 @@ const DecisionsModalView = ({ popupType }: Props) => {
         }
 
         {/*Visit to pages Selection */ }
-        { popupType === DecisionsTypes.DOWNLOAD_ASSETS
+        { popupType === DecisionsTypes.VISITS_A_PAGE
           &&
           <MultiSelectField
             label="Limit to Pages"
