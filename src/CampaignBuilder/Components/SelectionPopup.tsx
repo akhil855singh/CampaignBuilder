@@ -18,6 +18,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import DropdownView from "./DropdownView";
 import { DropdownType } from "../../Constants/enums";
+import { useReactFlow } from "@xyflow/react";
 
 interface Props {
   parentNodeId: string;
@@ -34,9 +35,15 @@ const SelectionPopup = ({
   type,
   parentNodeId = "",
   parentPosition,
-}: any) => {
+}: Props) => {
   const rootRef = useRef(null);
-  const [selectedType, setSelectedType] = useState("");
+  const [selectedType, setSelectedType] = useState({
+    buttonText: "",
+    title: "",
+    type: "",
+    description: "",
+    color: "",
+  });
   const { setNodes, setEdges } = useReactFlow();
   const [blocks, setBlocks] = useState([
     {
