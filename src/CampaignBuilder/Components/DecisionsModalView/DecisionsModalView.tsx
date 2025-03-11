@@ -110,7 +110,7 @@ const DecisionsModalView = ({ popupType }: Props) => {
         <Text fontSize="sm" color="gray.500">{ description }</Text>
 
         {/* Name Input */ }
-        { popupType === DecisionsTypes.DEVICE_VISIT
+        { (popupType === DecisionsTypes.DEVICE_VISIT
           || popupType === DecisionsTypes.DOWNLOAD_ASSETS
           || popupType === DecisionsTypes.REQUEST_DYNAMIC_CONTENT
           || popupType === DecisionsTypes.SENDS_A_APP_PUSH_MESSAGE
@@ -121,7 +121,7 @@ const DecisionsModalView = ({ popupType }: Props) => {
           || popupType === DecisionsTypes.SENDS_A_WHATS_APP_BOT_MESSAGE
           || popupType === DecisionsTypes.SENDS_A_WHATS_APP_MESSAGE
           || popupType === DecisionsTypes.SUBMITS_FORM
-          || popupType === DecisionsTypes.VISITS_A_PAGE
+          || popupType === DecisionsTypes.VISITS_A_PAGE)
           &&
           <FormControl mt={ 4 }>
             <FormLabel color="black">Name</FormLabel>
@@ -130,13 +130,13 @@ const DecisionsModalView = ({ popupType }: Props) => {
         }
 
         {/* Name Input */ }
-        { popupType === DecisionsTypes.SENDS_A_APP_PUSH_MESSAGE ||
+        { (popupType === DecisionsTypes.SENDS_A_APP_PUSH_MESSAGE ||
           popupType === DecisionsTypes.SENDS_A_RCS_BOT_MESSAGE ||
           popupType === DecisionsTypes.SENDS_A_RCS_MESSAGE ||
           popupType === DecisionsTypes.SENDS_A_TEXT_MESSAGE ||
           popupType === DecisionsTypes.SENDS_A_WEB_PUSH_MESSAGE ||
           popupType === DecisionsTypes.SENDS_A_WHATS_APP_BOT_MESSAGE ||
-          popupType === DecisionsTypes.SENDS_A_WHATS_APP_MESSAGE
+          popupType === DecisionsTypes.SENDS_A_WHATS_APP_MESSAGE)
           &&
           <CustomFormField label="Pattern the reply should match" placeholder=""></CustomFormField>
         }
