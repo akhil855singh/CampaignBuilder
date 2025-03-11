@@ -69,7 +69,7 @@ const ModalView = ({ handleClick }: Props) => {
     };
 
     return (
-        <Flex align="center" position="relative" justify="center" h="100vh" zIndex={20} bg="rgba(0, 0, 0, 0.4)">
+        <Flex align="center" position="relative" justify="center" alignItems="flex-start" h="100vh" zIndex={20} bg="rgba(0, 0, 0, 0.4)">
             <Box bg="white" p="16px"  mt={10} rounded="md" boxShadow="xl" w="700px">
                 {/* Title */}
                 <Text color="gray.900" fontSize="2xl" fontWeight="regular">
