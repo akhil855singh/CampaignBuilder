@@ -25,7 +25,8 @@ const categories = {
   channel:["Email","Text Massage","Whatsapp Message","Rcs Message","WhatsappBot Message","RcsBot Message","Webpush Messag","Apppush Message"],
   pointGroups:["New Subscribers", "Returning Users", "VIP Members"],
   addContactTo:["This campaign (restart the campaign)","25Feb_testing","A/B test 28Feb","A/B testing 34march 2"],
-  removeContactFrom:["This campaign (restart the campaign)","25Feb_testing","A/B test 28Feb","A/B testing 34march 2"]
+  removeContactFrom:["This campaign (restart the campaign)","25Feb_testing","A/B test 28Feb","A/B testing 34march 2"],
+  selectStage:["Stage 1", "Stage 2", "Stage 3", "Stage 4"],
 
 
 };

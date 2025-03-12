@@ -43,6 +43,7 @@ const DecisionsModalView = ({ popupType }: Props) => {
     pointsGroup:[],
     addContactTo:[],
     removeContactFrom:[],
+    selectStage:[],
   });
 
   // Generic function to handle selection
@@ -190,6 +191,7 @@ const DecisionsModalView = ({ popupType }: Props) => {
       </FormControl>
     );
   };
+ 
 
 
   return (
@@ -363,6 +365,15 @@ const DecisionsModalView = ({ popupType }: Props) => {
             options={categories.removeContactFrom}
             showspan={false}
           />
+        }
+         {popupType === ActionsTypes.CHANGE_CONTACT_STAGE
+          &&
+          <SingleSelect
+          label="Select stage"
+          options={categories.selectStage}
+          placeholder="Choose one..."
+          onChange={(value) => console.log("Selected:", value)}
+        />
         }
 
 
