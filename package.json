@@ -16,6 +16,7 @@
     "@emotion/styled": "^11.14.0",
     "@xyflow/react": "^12.4.4",
     "framer-motion": "^12.4.10",
+    "lucide-react": "^0.479.0",
     "nanoid": "^5.1.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
