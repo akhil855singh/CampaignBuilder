@@ -1,3 +1,8 @@
+enum MainNodeTypes {
+    CONTACT_SEGMENTS = "Contact segments",
+    CAMPAIGN_FORMS = "Campaign forms"
+}
+
 const DecisionsTypes = {
     DEVICE_VISIT: "Device visit",
     DOWNLOAD_ASSETS: "Downloads asset",
@@ -60,5 +65,6 @@ export {
     ActionsTypes,
     DropdownType,
     ButtonActions,
-    DecisionsTypes
+    DecisionsTypes,
+    MainNodeTypes
 }

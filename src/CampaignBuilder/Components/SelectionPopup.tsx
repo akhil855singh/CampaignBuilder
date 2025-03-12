@@ -13,6 +13,7 @@ import DropdownView from "./DropdownView";
 import { DropdownType } from "../../Constants/enums";
 import { useReactFlow } from "@xyflow/react";
 import { nanoid } from "nanoid";
+import { DecisionsModalView } from "./DecisionsModalView/DecisionsModalView";
 
 interface Props {
   parentNodeId: string;
@@ -22,7 +23,6 @@ interface Props {
     x: number;
     y: number;
   };
-  openModal: (type: string) => void;
 }
 
 const SelectionPopup = ({
@@ -30,22 +30,24 @@ const SelectionPopup = ({
   type,
   parentNodeId = "",
   parentPosition,
-  openModal,
 }: Props) => {
   const rootRef = useRef(null);
   const [selectedType, setSelectedType] = useState({
     buttonText: "",
     title: "",
-    type: "",
+    type: DropdownType,
     description: "",
     color: "",
   });
+
+  const [selectedItem, setSelectedItem] = useState("");
+  const [close, setClose] = useState(false);
   const { setNodes, setEdges } = useReactFlow();
   const [blocks, setBlocks] = useState([
     {
       buttonText: "Select",
       title: "Action",
-      type: "action",
+      type: DropdownType.ACTION,
       description:
         "An action is something executed by Vinmax (e.g. send an email).",
       color: "#e90010",
@@ -53,7 +55,7 @@ const SelectionPopup = ({
     {
       buttonText: "Select",
       title: "Condition",
-      type: "condition",
+      type: DropdownType.CONDITION,
       description:
         "A condition is based on known profile field values or submitted form data.",
       color: "#f3533e",
@@ -61,7 +63,12 @@ const SelectionPopup = ({
   ]);
 
   useEffect(() => {
-    if ((DropdownType.ACTION, DropdownType.CONDITION.includes(type) || !type)) {
+    console.log("popup type", type);
+    if (
+      type === DropdownType.ACTION ||
+      type === DropdownType.CONDITION ||
+      !type
+    ) {
       setBlocks([
         {
           buttonText: "Select",
@@ -91,13 +98,19 @@ const SelectionPopup = ({
     }
   }, [type]);
 
-  const onChangeHandler = (event: any) => {
+  const openSelectionHandlePopup = (item: string) => {
+    setClose(true);
+    setSelectedItem(item);
+  };
+
+  const onChangeHandler = (name: string) => {
     const id = nanoid();
+    console.log("for new node", parentNodeId, parentPosition, selectedType);
     setNodes((prevNodes) => [
       ...prevNodes,
       {
         parentId: parentNodeId,
-        id: nanoid(),
+        id: id,
         type: "text",
         connectable: true,
         position: {
@@ -105,8 +118,8 @@ const SelectionPopup = ({
           y: parentPosition.y,
         },
         data: {
-          label: event.target.value,
-          type: selectedType,
+          label: name,
+          type: selectedType.type,
         },
       },
     ]);
@@ -131,8 +144,10 @@ const SelectionPopup = ({
   return (
     <div
       style={{
-        top: "calc(100% + 20px)",
-        position: "absolute",
+        //top: "calc(100% + 20px)",
+        top: parentPosition.y + 20,
+        left: parentPosition.x - screen.width / 2,
+        position: "relative",
         zIndex: 1000,
       }}
     >
@@ -144,7 +159,8 @@ const SelectionPopup = ({
             dropdownType: selectedType.type,
             dropdownColor: selectedType.color,
           }}
-          openModal={openModal}
+          parentPosition={parentPosition}
+          selectedOption={(item: string) => openSelectionHandlePopup(item)}
         />
       ) : (
         <SimpleGrid
@@ -183,6 +199,13 @@ const SelectionPopup = ({
             </Card>
           ))}
         </SimpleGrid>
+      )}
+      {close && (
+        <DecisionsModalView
+          close={() => setClose(false)}
+          add={(name: string) => onChangeHandler(name)}
+          popupType={selectedItem}
+        />
       )}
     </div>
   );
