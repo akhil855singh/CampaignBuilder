@@ -69,5 +69,4 @@ export {
     DropdownType,
     ButtonActions,
     DecisionsTypes,
-    MainNodeTypes
 }

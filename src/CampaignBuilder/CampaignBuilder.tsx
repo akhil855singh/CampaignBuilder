@@ -9,7 +9,7 @@ import {
 } from "@xyflow/react";
 import { initialNodes, initialEdges } from "../Constants/Constants";
 import { TextNode } from "./Components/TextNode";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import "@xyflow/react/dist/style.css";
 import ContactSourceDropdown from "./Components/ContactSourceDropdown/ContactSourceDropdown";
 import { ModalView, ButtonActions } from "./Components/ModalView";
@@ -37,10 +37,8 @@ let edgeTypes = {
 function CampaignBuilder() {
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-    const [showSelectedPopup, setShowSelectedPopup] = useState(Boolean);
     const [showContactSourceView, setShowContactSourceView] = useState(true);
     const [showModal, setShowModal] = useState(false);
-    const [showSelectionsModal, setShowSelectionsModal] = useState("");
     const [isModalActive, setModalActive] = useState(false);
     const [nodeId, setNodeId] = useState("");
     const [mainModalItems, setMainModalItems] = useState<string[]>([]);
@@ -53,6 +51,12 @@ function CampaignBuilder() {
         type: DropdownType.DECISION,
     };
     const [data, setData] = useState(handleData);
+
+    useEffect(() => {
+        if (nodes.length == 0) {
+            setShowContactSourceView(true)
+        }
+    }, [nodes])
 
     // ✅ Memoize nodeTypes to avoid re-creation on every render
     const handleHandleClick = useCallback(
@@ -77,9 +81,8 @@ function CampaignBuilder() {
             //   if (position == "Bottom") {
             //     setShowSelectedPopup((prev) => !prev);
             //   }
-        },
-        []
-    );
+        }, []);
+
     // ✅ Memoize nodeTypes to avoid re-creation on every render
     nodeType = useMemo(() => ({
         text: (props) => <TextNode { ...props }
@@ -93,10 +96,10 @@ function CampaignBuilder() {
     nodeType = useMemo(
         () => ({
             text: (props) => (
-                <TextNode { ...props } handleHandleClick={ handleHandleClick } />
+                <TextNode { ...props } setNodes={ setNodes } handleHandleClick={ handleHandleClick } />
             ),
         }),
-        []
+        [setNodes]
     );
 
     edgeTypes = useMemo(

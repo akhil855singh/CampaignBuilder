@@ -62,8 +62,14 @@ function TextNode({
 
   // Handle Delete Action
   const handleDelete = useCallback(() => {
-    setNodes((prevNodes) => prevNodes.filter((node) => node.id !== id));
+    setNodes((prevNodes) => {
+      return prevNodes.filter((_, idx) => {
+        const nodeIndex = prevNodes.findIndex(n => n.id === id);
+        return idx < nodeIndex; // Keep only elements before the found index
+      });
+    });
   }, [id, setNodes]);
+  
 
   return (
     <div

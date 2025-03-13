@@ -172,8 +172,6 @@ const ModalView = ({ id, type, items, handleClick }: Props) => {
         </Flex>
       </Box>
     </Flex>
-      </Box >
-    </Flex >
   );
 };
 export { ModalView, ButtonActions };
