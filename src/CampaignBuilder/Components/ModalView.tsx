@@ -27,6 +27,11 @@ interface Props {
   handleClick: (actions: ButtonActions) => void;
 }
 
+const mainNodeData = [
+  "Contact segments",
+  "Campaign forms"
+]
+
 const data = [
   "24feb (90023)",
   "25feb (90024)",
@@ -40,19 +45,19 @@ const data = [
 ];
 
 const ModalView = ({ id, type, items, handleClick }: Props) => {
-  const { setNodes } = useReactFlow();
-  const [selectedSegments, setSelectedSegments] = useState<string[]>([]);
+  const { setNodes } = useReactFlow()
+  const [selectedSegments, setSelectedSegments] = useState<string[]>(items);
   const segments = ["Segment A", "Segment B", "Segment C", "Segment D"];
 
   useEffect(() => {
     switch (type) {
       case MainNodeTypes.CONTACT_SEGMENTS:
-        setSelectedSegments(items);
-        break;
+        setSelectedSegments(items)
+        break
       case MainNodeTypes.CAMPAIGN_FORMS:
-        break;
+        break
     }
-  }, [type]);
+  }, [type])
 
   const handleSelectSegment = (segment: string) => {
     if (!selectedSegments.includes(segment)) {
@@ -60,20 +65,12 @@ const ModalView = ({ id, type, items, handleClick }: Props) => {
     }
   };
 
-  const handleRemoveSegment = (segment: string) => {
-    setSelectedSegments(selectedSegments.filter((s) => s !== segment));
-  };
 
   function handleClickedItem() {
     if (items.length > 0) {
       setNodes((nds: any) =>
         nds.map((node: any) =>
-          node.id === id
-            ? {
-                ...node,
-                data: { ...node.data, label: selectedSegments.join(",") },
-              }
-            : node
+          node.id === id ? { ...node, data: { ...node.data, label: selectedSegments.join(",") } } : node
         )
       );
     } else {
@@ -88,145 +85,95 @@ const ModalView = ({ id, type, items, handleClick }: Props) => {
             y: screen.height / 4,
           },
           data: {
-            label: selectedSegments.join(","),
+            label: selectedSegments.join(", "),
             items: selectedSegments,
-            mainModalType: type,
+            mainModalType: type
           },
         },
       ]);
     }
-  }
+  };
 
   return (
-    <Flex
-      align="center"
-      position="relative"
-      justify="center"
-      alignItems="flex-start"
-      h="100vh"
-      zIndex={20}
-      bg="rgba(0, 0, 0, 0.4)"
-    >
-      <Box bg="white" p="16px" mt={10} rounded="md" boxShadow="xl" w="700px">
-        {/* Title */}
+    <Flex align="center" position="relative" justify="center" alignItems="flex-start" h="100vh" zIndex={ 20 } bg="rgba(0, 0, 0, 0.4)">
+      <Box bg="white" p="16px" mt={ 10 } rounded="md" boxShadow="xl" w="700px">
+        {/* Title */ }
         <Text color="gray.900" fontSize="2xl" fontWeight="regular">
           Contact Source
         </Text>
         <Text fontSize="sm" color="gray.500">
-          Contacts that are members of the selected segments will be
-          automatically added to this campaign.
+          Contacts that are members of the selected segments will be automatically added to this campaign.
         </Text>
 
-        {/* Contact Segments Selection */}
-        <FormControl mt={4}>
+        {/* Contact Segments Selection */ }
+        <FormControl mt={ 4 }>
           <FormLabel color="gray.500" fontWeight="bold">
-            Contact segments{" "}
-            <Text as="span" color="red.500">
-              *
-            </Text>
+            Contact segments <Text as="span" color="red.500">*</Text>
           </FormLabel>
 
           <Menu>
             <MenuButton
-              as={Button}
-              rightIcon={<ChevronDownIcon />}
+              as={ Button }
+              rightIcon={ <ChevronDownIcon /> }
               w="full"
               bg="white"
               border="1px solid"
               borderColor="gray.300"
               textAlign="left"
-              _hover={{ bg: "gray.50" }}
-              _focus={{ borderColor: "blue.400", boxShadow: "outline" }}
+              _hover={ { bg: "gray.50" } }
+              _focus={ { borderColor: "blue.400", boxShadow: "outline" } }
             >
-              {selectedSegments.length > 0 ? (
+              { selectedSegments.length > 0 ? (
                 selectedSegments.join(", ")
               ) : (
                 <Text color="gray.500">Choose one or more...</Text>
-              )}
+              ) }
             </MenuButton>
 
             <MenuList>
-              {segments.map((segment) => (
-                <MenuItem
-                  key={segment}
-                  onClick={() => handleSelectSegment(segment)}
-                >
-                  {segment}
+              { segments.map((segment) => (
+                <MenuItem key={ segment } onClick={ () => handleSelectSegment(segment) }>
+                  { segment }
                 </MenuItem>
-              ))}
+              )) }
             </MenuList>
           </Menu>
 
-          {/* Selected Segments Display */}
-          {selectedSegments.length > 0 && (
-            <Flex mt={2} gap={2} flexWrap="wrap">
-              {selectedSegments.map((segment) => (
-                <Tag key={segment} colorScheme="blue" size="lg">
-                  <TagLabel>{segment}</TagLabel>
-                  <TagCloseButton
-                    onClick={() => handleRemoveSegment(segment)}
-                  />
+          {/* Selected Segments Display */ }
+          { selectedSegments.length > 0 && (
+            <Flex mt={ 2 } gap={ 2 } flexWrap="wrap">
+              { selectedSegments.map((segment) => (
+                <Tag key={ segment } colorScheme="blue" size="lg">
+                  <TagLabel>{ segment }</TagLabel>
+                  <TagCloseButton onClick={ () => handleRemoveSegment(segment) } />
                 </Tag>
-              ))}
+              )) }
             </Flex>
-          )}
+          ) }
         </FormControl>
 
-        {/* Action Buttons */}
-        <Flex mt={6} justify="flex-end">
-          {/* <Button
-            onClick={() => [
-              handleClickedItem(),
-              handleClick(ButtonActions.ADD),
-            ]}
-            borderWidth={1}
-            borderColor="gray.400"
-            color="gray.900"
-            mr={2}
-          >
-            {" "}
-            + Add
-          </Button> */}
+        {/* Action Buttons */ }
+        <Flex mt={ 6 } justify="flex-end">
+          {
+            items.length > 0 ?
+              (
+                <Button onClick={ () => handleClickedItem() } borderWidth={ 1 } borderColor="gray.400" color="gray.900" mr={ 2 }> <LuPencilLine />
+                  Update</Button>
+              )
+              :
+              (
+                <Button onClick={ () => [handleClickedItem(), handleClick(ButtonActions.ADD)] } borderWidth={ 1 } borderColor="gray.400" color="gray.900" mr={ 2 }> + Add</Button>
+              )
+          }
 
-          {items.length > 0 ? (
-            <Button
-              onClick={() => handleClickedItem()}
-              borderWidth={1}
-              borderColor="gray.400"
-              color="gray.900"
-              mr={2}
-            >
-              {" "}
-              <LuPencilLine />
-              Update
-            </Button>
-          ) : (
-            <Button
-              onClick={() => [
-                handleClickedItem(),
-                handleClick(ButtonActions.ADD),
-              ]}
-              borderWidth={1}
-              borderColor="gray.400"
-              color="gray.900"
-              mr={2}
-            >
-              {" "}
-              + Add
-            </Button>
-          )}
-
-          <Button
-            onClick={() => handleClick(ButtonActions.CANCEL)}
-            borderWidth={1}
-            borderColor="gray.400"
-            color="gray.900"
-          >
+          <Button onClick={ () => handleClick(ButtonActions.CANCEL) } borderWidth={ 1 } borderColor="gray.400" color="gray.900">
             ✖ Cancel
           </Button>
         </Flex>
       </Box>
     </Flex>
+      </Box >
+    </Flex >
   );
 };
 export { ModalView, ButtonActions };

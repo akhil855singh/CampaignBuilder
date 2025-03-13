@@ -143,70 +143,70 @@ const SelectionPopup = ({
 
   return (
     <div
-      style={{
+      style={ {
         //top: "calc(100% + 20px)",
         top: parentPosition.y + 20,
         left: parentPosition.x - screen.width / 2,
         position: "relative",
         zIndex: 1000,
-      }}
+      } }
     >
-      {selectedType.buttonText.length > 0 ? (
+      { selectedType.buttonText.length > 0 ? (
         // <SelectDropdown onChange={onChangeHandler} />
         <DropdownView
-          parentId={parentNodeId}
-          dropdownProps={{
+          parentId={ parentNodeId }
+          dropdownProps={ {
             dropdownType: selectedType.type,
             dropdownColor: selectedType.color,
-          }}
-          parentPosition={parentPosition}
-          selectedOption={(item: string) => openSelectionHandlePopup(item)}
+          } }
+          parentPosition={ parentPosition }
+          selectedOption={ (item: string) => openSelectionHandlePopup(item) }
         />
       ) : (
         <SimpleGrid
-          ref={rootRef}
-          spacing={4}
+          ref={ rootRef }
+          spacing={ 4 }
           justifyContent="center"
           display="flex"
           templateColumns="repeat(3, minmax(200px, 1fr))"
         >
-          <button onClick={closeModal}>close</button>
-          {blocks.map((block, index) => (
+          <button onClick={ closeModal }>close</button>
+          { blocks.map((block, index) => (
             <Card
-              key={index}
+              key={ index }
               maxW="sm"
               borderWidth="1px"
               borderRadius="lg"
-              borderColor={block.color}
-              style={{ cursor: "pointer", width: "250px" }}
+              borderColor={ block.color }
+              style={ { cursor: "pointer", width: "250px" } }
             >
-              <CardHeader style={{ background: block.color, color: "white" }}>
+              <CardHeader style={ { background: block.color, color: "white" } }>
                 <Heading as="h3" size="md">
-                  {block.title}
+                  { block.title }
                 </Heading>
               </CardHeader>
               <CardBody>
-                <Text>{block.description}</Text>
+                <Text>{ block.description }</Text>
               </CardBody>
               <CardFooter>
                 <Button
-                  onClick={() => [setSelectedType(block)]}
+                  onClick={ () => [setSelectedType(block)] }
                   colorScheme="blue"
                 >
-                  {block.buttonText}
+                  { block.buttonText }
                 </Button>
               </CardFooter>
             </Card>
-          ))}
+          )) }
         </SimpleGrid>
-      )}
-      {close && (
+      ) }
+      { close && (
         <DecisionsModalView
-          close={() => setClose(false)}
-          add={(name: string) => onChangeHandler(name)}
-          popupType={selectedItem}
+          close={ () => setClose(false) }
+          add={ (name: string) => onChangeHandler(name) }
+          popupType={ selectedItem }
         />
-      )}
+      ) }
     </div>
   );
 };

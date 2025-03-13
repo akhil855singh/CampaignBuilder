@@ -80,14 +80,14 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
     labelColor = "black",
     icon,
   }) => (
-    <FormControl mt={4}>
+    <FormControl mt={ 4 }>
       <FormLabel color="black">
-        {label}{" "}
-        <Text as="span" color={labelColor}>
-          {icon}
+        { label }{ " " }
+        <Text as="span" color={ labelColor }>
+          { icon }
         </Text>
       </FormLabel>
-      <Input placeholder={placeholder || "Enter value"} />
+      <Input placeholder={ placeholder || "Enter value" } />
     </FormControl>
   );
 
@@ -110,49 +110,49 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
     options,
     showspan,
   }) => (
-    <FormControl mt={4}>
+    <FormControl mt={ 4 }>
       <FormLabel color="black">
-        {label}
-        {showspan && (
+        { label }
+        { showspan && (
           <Text as="span" color="gray.400">
             ❓
           </Text>
-        )}
+        ) }
       </FormLabel>
       <Menu>
         <MenuButton
-          as={Button}
+          as={ Button }
           color="gray.800"
-          rightIcon={<ChevronDownIcon />}
+          rightIcon={ <ChevronDownIcon /> }
           w="full"
           textAlign="left"
           justifyContent="space-between"
           border="1px solid"
           borderColor="gray.800"
         >
-          {selectedItems[categoryKey]?.length > 0
+          { selectedItems[categoryKey]?.length > 0
             ? selectedItems[categoryKey].join(", ")
-            : "Choose one or more..."}
+            : "Choose one or more..." }
         </MenuButton>
         <MenuList>
-          {options.map((option) => (
+          { options.map((option) => (
             <MenuItem
-              key={option}
-              onClick={() => handleSelect(categoryKey, option)}
+              key={ option }
+              onClick={ () => handleSelect(categoryKey, option) }
             >
-              {option}
+              { option }
             </MenuItem>
-          ))}
+          )) }
         </MenuList>
       </Menu>
-      {/* Selected Items */}
-      <Flex mt={2} gap={2} flexWrap="wrap">
-        {selectedItems[categoryKey]?.map((option) => (
-          <Tag key={option} colorScheme="blue" size="md">
-            <TagLabel>{option}</TagLabel>
-            <TagCloseButton onClick={() => handleRemove(categoryKey, option)} />
+      {/* Selected Items */ }
+      <Flex mt={ 2 } gap={ 2 } flexWrap="wrap">
+        { selectedItems[categoryKey]?.map((option) => (
+          <Tag key={ option } colorScheme="blue" size="md">
+            <TagLabel>{ option }</TagLabel>
+            <TagCloseButton onClick={ () => handleRemove(categoryKey, option) } />
           </Tag>
-        ))}
+        )) }
       </Flex>
     </FormControl>
   );
@@ -166,11 +166,11 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
     placeholder,
   }) => {
     return (
-      <FormControl mt={4}>
-        <FormLabel>{label}</FormLabel>
+      <FormControl mt={ 4 }>
+        <FormLabel>{ label }</FormLabel>
         <Box position="relative" width="full">
           <Textarea
-            placeholder={placeholder || "Enter text..."}
+            placeholder={ placeholder || "Enter text..." }
             size="md"
             resize="both" // Allows left-corner expansion
             minHeight="100px"
@@ -211,41 +211,41 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
           display="flex"
           alignItems="center"
           fontWeight="bold"
-          margin={2}
+          margin={ 2 }
         >
-          {label}
-          <Icon as={InfoIcon} ml={1} color="gray.400" boxSize={4} />{" "}
-          {/* Info icon */}
+          { label }
+          <Icon as={ InfoIcon } ml={ 1 } color="gray.400" boxSize={ 4 } />{ " " }
+          {/* Info icon */ }
         </FormLabel>
 
         <InputGroup>
           <Select
-            value={selectedValue}
-            onChange={handleChange}
-            placeholder={placeholder}
+            value={ selectedValue }
+            onChange={ handleChange }
+            placeholder={ placeholder }
           >
-            {options.map((option) => (
-              <option key={option} value={option}>
-                {option}
+            { options.map((option) => (
+              <option key={ option } value={ option }>
+                { option }
               </option>
-            ))}
+            )) }
           </Select>
 
-          {/* Show Clear Button when a value is selected */}
-          {selectedValue && (
+          {/* Show Clear Button when a value is selected */ }
+          { selectedValue && (
             <InputRightElement width="4.5rem">
-              <Flex align="center" gap={1}>
-                {/* Clear Selection Icon (XCircle) */}
+              <Flex align="center" gap={ 1 }>
+                {/* Clear Selection Icon (XCircle) */ }
                 <IconButton
-                  icon={<XCircle size={16} />}
+                  icon={ <XCircle size={ 16 } /> }
                   aria-label="Clear selection"
                   size="xs"
                   variant="ghost"
-                  onClick={handleClear}
+                  onClick={ handleClear }
                 />
               </Flex>
             </InputRightElement>
-          )}
+          ) }
         </InputGroup>
       </FormControl>
     );
@@ -254,28 +254,28 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
   return (
     <Flex
       position="fixed"
-      top={0}
-      left={0}
+      top={ 0 }
+      left={ 0 }
       w="100vw"
       h="100vh"
       alignSelf="center"
-      zIndex={20}
+      zIndex={ 20 }
       align="flex-start"
       justify="center"
       bg="rgba(0, 0, 0, 0.3)"
     >
-      <Box top={20} bg="white" p={6} rounded="md" boxShadow="lg" w="600px">
-        {/* Title */}
+      <Box top={ 20 } bg="white" p={ 6 } rounded="md" boxShadow="lg" w="600px">
+        {/* Title */ }
 
         <Text fontSize="xl" color="black" fontWeight="bold">
-          {title}
+          { title }
         </Text>
         <Text fontSize="sm" color="gray.500">
-          {description}
+          { description }
         </Text>
 
-        {/* Name Input */}
-        {(popupType === DecisionsTypes.DEVICE_VISIT ||
+        {/* Name Input */ }
+        { (popupType === DecisionsTypes.DEVICE_VISIT ||
           popupType === DecisionsTypes.DOWNLOAD_ASSETS ||
           popupType === DecisionsTypes.REQUEST_DYNAMIC_CONTENT ||
           popupType === DecisionsTypes.SENDS_A_APP_PUSH_MESSAGE ||
@@ -290,206 +290,206 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
           popupType === ActionsTypes.ADD_DO_NOT_CONTACT ||
           popupType === ActionsTypes.ADD_TO_COMPANY_SCORE ||
           popupType === ActionsTypes.ADD_TO_COMPANY_ACTION) && (
-          <FormControl mt={4}>
-            <FormLabel color="black">Name</FormLabel>
-            <Input
-              onChange={(e) => setSelectedName(e.target.value)}
-              placeholder="Enter name"
-            />
-          </FormControl>
-        )}
+            <FormControl mt={ 4 }>
+              <FormLabel color="black">Name</FormLabel>
+              <Input
+                onChange={ (e) => setSelectedName(e.target.value) }
+                placeholder="Enter name"
+              />
+            </FormControl>
+          ) }
 
-        {/* Name Input */}
-        {(popupType === DecisionsTypes.SENDS_A_APP_PUSH_MESSAGE ||
+        {/* Name Input */ }
+        { (popupType === DecisionsTypes.SENDS_A_APP_PUSH_MESSAGE ||
           popupType === DecisionsTypes.SENDS_A_RCS_BOT_MESSAGE ||
           popupType === DecisionsTypes.SENDS_A_RCS_MESSAGE ||
           popupType === DecisionsTypes.SENDS_A_TEXT_MESSAGE ||
           popupType === DecisionsTypes.SENDS_A_WEB_PUSH_MESSAGE ||
           popupType === DecisionsTypes.SENDS_A_WHATS_APP_BOT_MESSAGE ||
           popupType === DecisionsTypes.SENDS_A_WHATS_APP_MESSAGE) && (
-          <CustomFormField
-            label="Pattern the reply should match"
-            placeholder=""
-            labelColor="gray.300"
-            icon="❓"
-          ></CustomFormField>
-        )}
+            <CustomFormField
+              label="Pattern the reply should match"
+              placeholder=""
+              labelColor="gray.300"
+              icon="❓"
+            ></CustomFormField>
+          ) }
 
-        {/* Device Type Selection */}
-        {popupType === DecisionsTypes.DEVICE_VISIT && (
+        {/* Device Type Selection */ }
+        { popupType === DecisionsTypes.DEVICE_VISIT && (
           <MultiSelectField
             label="Device type"
             categoryKey="deviceTypes"
-            selectedItems={selectedItems}
-            handleSelect={handleSelect}
-            handleRemove={handleRemove}
-            options={categories.deviceTypes}
-            showspan={false}
+            selectedItems={ selectedItems }
+            handleSelect={ handleSelect }
+            handleRemove={ handleRemove }
+            options={ categories.deviceTypes }
+            showspan={ false }
           />
-        )}
-        {/* Device brand Selection */}
-        {popupType === DecisionsTypes.DEVICE_VISIT && (
+        ) }
+        {/* Device brand Selection */ }
+        { popupType === DecisionsTypes.DEVICE_VISIT && (
           <MultiSelectField
             label="Device brand"
             categoryKey="deviceBrands"
-            selectedItems={selectedItems}
-            handleSelect={handleSelect}
-            handleRemove={handleRemove}
-            options={categories.deviceBrands}
-            showspan={false}
+            selectedItems={ selectedItems }
+            handleSelect={ handleSelect }
+            handleRemove={ handleRemove }
+            options={ categories.deviceBrands }
+            showspan={ false }
           />
-        )}
-        {/* Device OS Selection */}
-        {popupType === DecisionsTypes.DEVICE_VISIT && (
+        ) }
+        {/* Device OS Selection */ }
+        { popupType === DecisionsTypes.DEVICE_VISIT && (
           <MultiSelectField
             label="Device OS"
             categoryKey="deviceOS"
-            selectedItems={selectedItems}
-            handleSelect={handleSelect}
-            handleRemove={handleRemove}
-            options={categories.deviceOS}
-            showspan={false}
+            selectedItems={ selectedItems }
+            handleSelect={ handleSelect }
+            handleRemove={ handleRemove }
+            options={ categories.deviceOS }
+            showspan={ false }
           />
-        )}
+        ) }
 
-        {/* Device OS Selection */}
-        {popupType === DecisionsTypes.DOWNLOAD_ASSETS && (
+        {/* Device OS Selection */ }
+        { popupType === DecisionsTypes.DOWNLOAD_ASSETS && (
           <MultiSelectField
             label="Limit to Assets"
             categoryKey="assets"
-            selectedItems={selectedItems}
-            handleSelect={handleSelect}
-            handleRemove={handleRemove}
-            options={categories.assets}
-            showspan={true}
+            selectedItems={ selectedItems }
+            handleSelect={ handleSelect }
+            handleRemove={ handleRemove }
+            options={ categories.assets }
+            showspan={ true }
           />
-        )}
+        ) }
 
-        {/*Visit to pages Selection */}
-        {popupType === DecisionsTypes.VISITS_A_PAGE && (
+        {/*Visit to pages Selection */ }
+        { popupType === DecisionsTypes.VISITS_A_PAGE && (
           <MultiSelectField
             label="Limit to Pages"
             categoryKey="limitToPages"
-            selectedItems={selectedItems}
-            handleSelect={handleSelect}
-            handleRemove={handleRemove}
-            options={categories.limitToPages}
-            showspan={false}
+            selectedItems={ selectedItems }
+            handleSelect={ handleSelect }
+            handleRemove={ handleRemove }
+            options={ categories.limitToPages }
+            showspan={ false }
           />
-        )}
-        {popupType === DecisionsTypes.VISITS_A_PAGE && (
+        ) }
+        { popupType === DecisionsTypes.VISITS_A_PAGE && (
           <CustomFormField
             label="URL"
             placeholder=""
             labelColor="gray.300"
             icon="❓"
           ></CustomFormField>
-        )}
-        {popupType === DecisionsTypes.VISITS_A_PAGE && (
+        ) }
+        { popupType === DecisionsTypes.VISITS_A_PAGE && (
           <CustomFormField
             label="Referrer"
             placeholder=""
             labelColor="gray.300"
             icon="❓"
           ></CustomFormField>
-        )}
+        ) }
 
-        {/* Channel Selection */}
+        {/* Channel Selection */ }
 
-        {popupType === ActionsTypes.ADD_DO_NOT_CONTACT && (
+        { popupType === ActionsTypes.ADD_DO_NOT_CONTACT && (
           <MultiSelectField
             label="Channels"
             categoryKey="channel"
-            selectedItems={selectedItems}
-            handleSelect={handleSelect}
-            handleRemove={handleRemove}
-            options={categories.channel}
-            showspan={false}
+            selectedItems={ selectedItems }
+            handleSelect={ handleSelect }
+            handleRemove={ handleRemove }
+            options={ categories.channel }
+            showspan={ false }
           />
-        )}
-        {popupType === ActionsTypes.ADD_DO_NOT_CONTACT && (
+        ) }
+        { popupType === ActionsTypes.ADD_DO_NOT_CONTACT && (
           <ExpandableTextArea
             label="Reason"
             placeholder="Enter your reason here..."
           />
-        )}
+        ) }
 
-        {popupType === ActionsTypes.ADD_TO_COMPANY_SCORE && (
+        { popupType === ActionsTypes.ADD_TO_COMPANY_SCORE && (
           <CustomFormField
             label="Add to company's score"
             placeholder=""
             labelColor="red"
             icon="*"
           ></CustomFormField>
-        )}
+        ) }
 
-        {popupType === ActionsTypes.ADD_TO_COMPANY_ACTION && (
+        { popupType === ActionsTypes.ADD_TO_COMPANY_ACTION && (
           <CustomFormField
             label="Companies"
             placeholder=""
             labelColor="red"
             icon="*"
           ></CustomFormField>
-        )}
-        {popupType === ActionsTypes.ADJUST_CONTACT_POINTS && (
+        ) }
+        { popupType === ActionsTypes.ADJUST_CONTACT_POINTS && (
           <CustomFormField
             label="Points (+/-)"
             placeholder=""
             labelColor="red"
             icon="*"
           ></CustomFormField>
-        )}
+        ) }
 
-        {popupType === ActionsTypes.ADJUST_CONTACT_POINTS && (
+        { popupType === ActionsTypes.ADJUST_CONTACT_POINTS && (
           <SingleSelect
             label="Point group"
-            options={categories.pointGroups}
+            options={ categories.pointGroups }
             placeholder="Choose one..."
-            onChange={(value) => console.log("Selected:", value)}
+            onChange={ (value) => console.log("Selected:", value) }
           />
-        )}
-        {popupType === ActionsTypes.CHANGE_CAMPAIGNS && (
+        ) }
+        { popupType === ActionsTypes.CHANGE_CAMPAIGNS && (
           <MultiSelectField
             label="Add contact to"
             categoryKey="addContactTo"
-            selectedItems={selectedItems}
-            handleSelect={handleSelect}
-            handleRemove={handleRemove}
-            options={categories.addContactTo}
-            showspan={false}
+            selectedItems={ selectedItems }
+            handleSelect={ handleSelect }
+            handleRemove={ handleRemove }
+            options={ categories.addContactTo }
+            showspan={ false }
           />
-        )}
-        {popupType === ActionsTypes.CHANGE_CAMPAIGNS && (
+        ) }
+        { popupType === ActionsTypes.CHANGE_CAMPAIGNS && (
           <MultiSelectField
             label="Remove contact from"
             categoryKey="removeContactFrom"
-            selectedItems={selectedItems}
-            handleSelect={handleSelect}
-            handleRemove={handleRemove}
-            options={categories.removeContactFrom}
-            showspan={false}
+            selectedItems={ selectedItems }
+            handleSelect={ handleSelect }
+            handleRemove={ handleRemove }
+            options={ categories.removeContactFrom }
+            showspan={ false }
           />
-        )}
-        {popupType === ActionsTypes.CHANGE_CONTACT_STAGE && (
+        ) }
+        { popupType === ActionsTypes.CHANGE_CONTACT_STAGE && (
           <SingleSelect
             label="Select stage"
-            options={categories.selectStage}
+            options={ categories.selectStage }
             placeholder="Choose one..."
-            onChange={(value) => console.log("Selected:", value)}
+            onChange={ (value) => console.log("Selected:", value) }
           />
-        )}
+        ) }
 
-        {/* Action Buttons */}
-        <Flex mt={6} justify="flex-end">
+        {/* Action Buttons */ }
+        <Flex mt={ 6 } justify="flex-end">
           <Button
-            onClick={close}
+            onClick={ close }
             borderColor="gray.400"
             color="gray.900"
-            mr={2}
+            mr={ 2 }
           >
             ✖ Cancel
           </Button>
-          <Button onClick={() => [add(selectedName), close]} colorScheme="blue">
+          <Button onClick={ () => [add(selectedName), close] } colorScheme="blue">
             + Add
           </Button>
         </Flex>
