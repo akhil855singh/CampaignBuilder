@@ -27,8 +27,14 @@ const categories = {
   addContactTo:["This campaign (restart the campaign)","25Feb_testing","A/B test 28Feb","A/B testing 34march 2"],
   removeContactFrom:["This campaign (restart the campaign)","25Feb_testing","A/B test 28Feb","A/B testing 34march 2"],
   selectStage:["Stage 1", "Stage 2", "Stage 3", "Stage 4"],
-
-
+  jumpToEvent:["Stage 1", "Stage 2", "Stage 3", "Stage 4"],
+  addContactToSelectedSegment:["Stage 1", "Stage 2", "Stage 3", "Stage 4"],
+  removeContactFromSelectedSegment:["Stage 1", "Stage 2", "Stage 3", "Stage 4"],
+  addTags:["admin 1", "admin 2", "admin 3", "admin 4"],
+  removeTags:["admin 1", "admin 2", "admin 3", "admin 4"],
+  integration:["Stage 1", "Stage 2", "Stage 3", "Stage 4"],
+  selectMessage:["Stage 1", "Stage 2", "Stage 3", "Stage 4"],
+  selectAMarketingMessage:["Stage 1", "Stage 2", "Stage 3", "Stage 4"],
 };
 
 const getPopUpHeaderText = (popupType: string) => {
