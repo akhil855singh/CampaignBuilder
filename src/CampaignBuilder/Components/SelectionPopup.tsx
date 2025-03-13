@@ -107,7 +107,7 @@ const SelectionPopup = ({
         },
       ]);
     }
-  }, [type]);
+  }, [isNodeGettingEdited, type]);
 
   const openSelectionHandlePopup = (item: string) => {
     setOpenDecisionPopup(true);

@@ -40,7 +40,6 @@ function CampaignBuilder() {
   const [showSelectedPopup, setShowSelectedPopup] = useState(Boolean);
   const [showContactSourceView, setShowContactSourceView] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [showSelectionsModal, setShowSelectionsModal] = useState("");
   const [isModalActive, setModalActive] = useState(false);
   const [decisionModalActive, setDecisionModalActive] = useState(false);
   const [mainModalItems, setMainModalItems] = useState<string[]>([]);
@@ -49,7 +48,7 @@ function CampaignBuilder() {
   const [copyNode, setCopyNode] = useState({});
   const [isFirstNode, setIsFirstNode] = useState(false);
   let nodeId = "";
-  const [editNode, setEditNode] = useState(true);
+  const [editNode, setEditNode] = useState(false);
 
   let handleData: HandleData = {
     id: "",
