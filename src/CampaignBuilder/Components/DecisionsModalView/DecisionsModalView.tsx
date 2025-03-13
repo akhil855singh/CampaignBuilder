@@ -22,11 +22,14 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
+import { XCircle } from "lucide-react";
+import { InfoIcon } from "@chakra-ui/icons";
 import { ActionsTypes, DecisionsTypes } from "../../../Constants/enums";
 import { categories, getPopUpHeaderText } from "./DecisionsModalViewModal";
-import { HelpCircle, XCircle } from "lucide-react";
-import { InfoIcon } from "@chakra-ui/icons";
 interface Props {
+  id: string
+  type: string
+  items: string[]
   close: () => void;
   add: (item: string) => void;
   popupType: string;
@@ -76,8 +79,8 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
   interface CustomFormFieldProps {
     label: string;
     placeholder: string;
-    labelColor?: string; // Optional label color
-    icon?: React.ReactNode; // Optional icon/image
+    labelColor?: string;
+    icon?: React.ReactNode;
   }
   const CustomFormField: React.FC<CustomFormFieldProps> = ({
     label,

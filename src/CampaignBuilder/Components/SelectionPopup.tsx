@@ -7,6 +7,8 @@ import {
   CardHeader,
   Heading,
   SimpleGrid,
+  Box,
+  Flex,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import DropdownView from "./DropdownView";
@@ -16,16 +18,20 @@ import { nanoid } from "nanoid";
 import { DecisionsModalView } from "./DecisionsModalView/DecisionsModalView";
 
 interface Props {
-  parentNodeId: string;
-  closeModal: () => void;
-  type: DropdownType.ACTION | DropdownType.CONDITION | DropdownType.DECISION;
+  isFirstNode: boolean
+  nodeCopy: {}
+  parentNodeId: string
+  closeModal: () => void
+  type: DropdownType.ACTION | DropdownType.CONDITION | DropdownType.DECISION
   parentPosition: {
     x: number;
     y: number;
-  };
+  }
 }
 
 const SelectionPopup = ({
+  isFirstNode,
+  nodeCopy,
   closeModal,
   type,
   parentNodeId = "",
@@ -103,9 +109,12 @@ const SelectionPopup = ({
     setSelectedItem(item);
   };
 
+  const insertCopiedNode = () => {
+    setNodes((prevNodes) => prevNodes.splice(1, 0, nodeCopy))
+  }
+
   const onChangeHandler = (name: string) => {
     const id = nanoid();
-    console.log("for new node", parentNodeId, parentPosition, selectedType);
     setNodes((prevNodes) => [
       ...prevNodes,
       {
@@ -146,14 +155,14 @@ const SelectionPopup = ({
       style={ {
         //top: "calc(100% + 20px)",
         top: parentPosition.y + 20,
-        left: parentPosition.x - screen.width / 2,
+        left: parentPosition.x / 2,
         position: "relative",
         zIndex: 1000,
       } }
     >
       { selectedType.buttonText.length > 0 ? (
-        // <SelectDropdown onChange={onChangeHandler} />
         <DropdownView
+          position={ [parentPosition.y + 20, parentPosition.x] }
           parentId={ parentNodeId }
           dropdownProps={ {
             dropdownType: selectedType.type,
@@ -161,44 +170,76 @@ const SelectionPopup = ({
           } }
           parentPosition={ parentPosition }
           selectedOption={ (item: string) => openSelectionHandlePopup(item) }
+          backBtn={ () => setSelectedType({ ...selectedItem, buttonText: "" }) }
         />
       ) : (
-        <SimpleGrid
-          ref={ rootRef }
-          spacing={ 4 }
-          justifyContent="center"
-          display="flex"
-          templateColumns="repeat(3, minmax(200px, 1fr))"
-        >
-          <button onClick={ closeModal }>close</button>
-          { blocks.map((block, index) => (
-            <Card
-              key={ index }
-              maxW="sm"
-              borderWidth="1px"
-              borderRadius="lg"
-              borderColor={ block.color }
-              style={ { cursor: "pointer", width: "250px" } }
+        <>
+          <SimpleGrid
+            ref={ rootRef }
+            spacing={ 4 }
+            justifyContent="center"
+            display="flex"
+            templateColumns="repeat(3, minmax(200px, 1fr))"
+            maxW={ 250 * 3 }
+            padding={ 5 }
+          >
+            { blocks.map((block, index) => (
+              <Card
+                key={ index }
+                maxW="sm"
+                borderWidth="1px"
+                borderRadius="lg"
+                borderColor={ block.color }
+                style={ { cursor: "pointer", width: "250px" } }
+              >
+                <CardHeader style={ { background: block.color, color: "white" } }>
+                  <Heading as="h3" size="md">
+                    { block.title }
+                  </Heading>
+                </CardHeader>
+                <CardBody>
+                  <Text>{ block.description }</Text>
+                </CardBody>
+                <CardFooter>
+                  <Button
+                    onClick={ () => [setSelectedType(block)] }
+                    colorScheme="blue"
+                  >
+                    { block.buttonText }
+                  </Button>
+                </CardFooter>
+              </Card>
+            )) }
+          </SimpleGrid>
+
+          { isFirstNode && Object.keys(nodeCopy).length > 0 && (
+            <Box
+              border="1px solid"
+              borderColor="gray.200"
+              borderRadius="md"
+              boxShadow="sm"
+              p={ 4 }
+              position="relative"
+                w={248 * 3}
             >
-              <CardHeader style={ { background: block.color, color: "white" } }>
-                <Heading as="h3" size="md">
-                  { block.title }
-                </Heading>
-              </CardHeader>
-              <CardBody>
-                <Text>{ block.description }</Text>
-              </CardBody>
-              <CardFooter>
-                <Button
-                  onClick={ () => [setSelectedType(block)] }
-                  colorScheme="blue"
-                >
-                  { block.buttonText }
-                </Button>
-              </CardFooter>
-            </Card>
-          )) }
-        </SimpleGrid>
+              <Box
+                h="3px"
+                bgGradient="linear(to-r, teal.300, blue.500, orange.400)"
+                borderTopRadius="md"
+                mb={ 4 }
+              />
+
+              <Flex justify="space-between" align="center">
+                <Box>
+                  <Text fontWeight="bold">Insert cloned event here</Text>
+                  <Text color="gray.500">Name: lkjhk</Text>
+                  <Text color="gray.500">From: New campaign</Text>
+                </Box>
+                <Button onClick={() => insertCopiedNode()} textColor="gray.900" size="sm" bg={"rgb(231, 231, 231)"} variant="outline">Insert</Button>
+              </Flex>
+            </Box>
+          ) }
+        </>
       ) }
       { close && (
         <DecisionsModalView

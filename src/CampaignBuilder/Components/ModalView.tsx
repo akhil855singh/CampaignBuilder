@@ -32,7 +32,7 @@ const mainNodeData = [
   "Campaign forms"
 ]
 
-const data = [
+const segments = [
   "24feb (90023)",
   "25feb (90024)",
   "30 days from today (26)",
@@ -47,8 +47,8 @@ const data = [
 const ModalView = ({ id, type, items, handleClick }: Props) => {
   const { setNodes } = useReactFlow()
   const [selectedSegments, setSelectedSegments] = useState<string[]>(items);
-  const segments = ["Segment A", "Segment B", "Segment C", "Segment D"];
 
+  console.log("ID - ", id)
   useEffect(() => {
     switch (type) {
       case MainNodeTypes.CONTACT_SEGMENTS:
@@ -68,9 +68,10 @@ const ModalView = ({ id, type, items, handleClick }: Props) => {
 
   function handleClickedItem() {
     if (items.length > 0) {
-      setNodes((nds: any) =>
-        nds.map((node: any) =>
-          node.id === id ? { ...node, data: { ...node.data, label: selectedSegments.join(",") } } : node
+      console.log("udateing", id)
+      setNodes((nds) =>
+        nds.map((node) =>
+          node.id === id ? { ...node, data: { ...node.data, label: selectedSegments.join(","), items: selectedSegments } } : node
         )
       );
     } else {
@@ -92,6 +93,10 @@ const ModalView = ({ id, type, items, handleClick }: Props) => {
         },
       ]);
     }
+  };
+
+  const handleRemoveSegment = (segment: string) => {
+    setSelectedSegments(selectedSegments.filter((s) => s !== segment));
   };
 
   return (
@@ -157,7 +162,7 @@ const ModalView = ({ id, type, items, handleClick }: Props) => {
           {
             items.length > 0 ?
               (
-                <Button onClick={ () => handleClickedItem() } borderWidth={ 1 } borderColor="gray.400" color="gray.900" mr={ 2 }> <LuPencilLine />
+                <Button onClick={ () => [handleClickedItem(), handleClick(ButtonActions.CANCEL)] } borderWidth={ 1 } borderColor="gray.400" color="gray.900" mr={ 2 }> <LuPencilLine />
                   Update</Button>
               )
               :

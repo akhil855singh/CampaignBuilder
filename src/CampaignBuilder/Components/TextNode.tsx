@@ -1,23 +1,26 @@
 import React, { useCallback, useState } from "react";
-import { Handle, Position, node } from "@xyflow/react";
+import { Handle, Position, useReactFlow, Node } from "@xyflow/react";
 import { DropdownType, SelectionPopup } from "./SelectionPopup";
+import { PiCopySimple } from "react-icons/pi";
+import { nanoid } from "nanoid";
 
 interface Props {
   id: string;
   data: {
     label: string;
     type: DropdownType.ACTION | DropdownType.CONDITION | DropdownType.DECISION;
-  };
-  setNodes: React.Dispatch<React.SetStateAction<any[]>>;
-  positionAbsoluteX: number;
-  positionAbsoluteY: number;
+  }
+  setNodes: React.Dispatch<React.SetStateAction<any[]>>
+  positionAbsoluteX: number
+  positionAbsoluteY: number
   handleHandleClick: (
     nodeId: string,
     position: string,
     coordinate: number[],
     type: DropdownType
   ) => void;
-  updateNode: (id: string) => void;
+  updateNode: (id: string) => void
+  copyNode: (node: Node) => void
 }
 
 function TextNode({
@@ -27,49 +30,47 @@ function TextNode({
   positionAbsoluteX,
   positionAbsoluteY,
   handleHandleClick,
-  updateNode
+  updateNode,
+  copyNode
 }: Props) {
   const [isHovered, setIsHovered] = useState(false);
   const [isModalActive, setModalActive] = useState(false);
+  const { getNodes } = useReactFlow()
 
-  console.log("node data", data);
-  // Handle Edit Action
-  const handleEdit = () => {
-    const newText = prompt("Edit text:", data.label);
-    if (newText) {
-      setNodes((nds: any) =>
-        nds.map((node: any) =>
-          node.id === id
-            ? { ...node, data: { ...node.data, label: newText } }
-            : node
-        )
-      );
-    }
-  };
-
-  const handleClick = useCallback(
-    (
-      id: string,
-      position: string,
-      coordinate: number[],
-      type: DropdownType
-    ) => {
-      //setModalActive(prevState => !prevState);
-      handleHandleClick(id, position, coordinate, type);
-    },
-    [handleHandleClick]
-  );
+  const handleClick = useCallback((
+    id: string,
+    position: string,
+    coordinate: number[],
+    type: DropdownType
+  ) => {
+    handleHandleClick(id, position, coordinate, type);
+  }, [handleHandleClick]);
 
   // Handle Delete Action
   const handleDelete = useCallback(() => {
     setNodes((prevNodes) => {
       return prevNodes.filter((_, idx) => {
-        const nodeIndex = prevNodes.findIndex(n => n.id === id);
-        return idx < nodeIndex; // Keep only elements before the found index
+        const nodeIndex = prevNodes.findIndex(n => n.id === id)
+        return idx < nodeIndex
       });
     });
-  }, [id, setNodes]);
-  
+  }, [id, setNodes])
+
+  const handleCopyNode = useCallback(() => {
+    let allNodes = getNodes()
+    let nodeToClone = allNodes.find(node => node.id === id)
+    if (!nodeToClone) return;
+
+    const newNode = {
+      ...nodeToClone,
+      id: nanoid(),
+      position: {
+        x: nodeToClone.position.x + 50,
+        y: nodeToClone.position.y + 50,
+      },
+    };
+    copyNode(newNode)
+  }, [getNodes, setNodes, id])
 
   return (
     <div
@@ -188,6 +189,25 @@ function TextNode({
             gap: 2,
           } }
         >
+          <button
+            onClick={ () => handleCopyNode() }
+            style={ {
+              background: "#357ABD",
+              color: "white",
+              border: "none",
+              borderRadius: "50%",
+              width: 20,
+              height: 20,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 14,
+              fontWeight: "bold",
+            } }
+          >
+            <PiCopySimple />
+          </button>
           <button
             onClick={ () => updateNode(id) }
             style={ {

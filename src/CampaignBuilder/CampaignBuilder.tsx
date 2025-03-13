@@ -6,18 +6,17 @@ import {
     Controls,
     useEdgesState,
     addEdge,
+    useReactFlow
 } from "@xyflow/react";
 import { initialNodes, initialEdges } from "../Constants/Constants";
 import { TextNode } from "./Components/TextNode";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import "@xyflow/react/dist/style.css";
 import ContactSourceDropdown from "./Components/ContactSourceDropdown/ContactSourceDropdown";
 import { ModalView, ButtonActions } from "./Components/ModalView";
 import CustomEdge from "./Components/ButtonEdge";
-import { ActionsModalView } from "./Components/ActionsModalView/ActionsModalView";
-import { DecisionsModalView } from "./Components/DecisionsModalView/DecisionsModalView";
 import { DropdownType } from "../Constants/enums";
 import { SelectionPopup } from "./Components/SelectionPopup";
+import "@xyflow/react/dist/style.css";
 
 interface HandleData {
     id: string;
@@ -37,12 +36,17 @@ let edgeTypes = {
 function CampaignBuilder() {
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+    const { getNodes } = useReactFlow()
     const [showContactSourceView, setShowContactSourceView] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [isModalActive, setModalActive] = useState(false);
-    const [nodeId, setNodeId] = useState("");
+    const [decisionModalActive, setDecisionModalActive] = useState(false)
     const [mainModalItems, setMainModalItems] = useState<string[]>([]);
-    const [modalType, setModalType] = useState("");
+    const [modalType, setModalType] = useState("")
+    const [editedId, setEditedId] = useState("")
+    const [copyNode, setCopyNode] = useState({})
+    const [isFirstNode, setIsFirstNode] = useState(false)
+    let nodeId = ""
 
     let handleData: HandleData = {
         id: "",
@@ -54,7 +58,10 @@ function CampaignBuilder() {
 
     useEffect(() => {
         if (nodes.length == 0) {
+            setModalActive(false)
             setShowContactSourceView(true)
+        } else {
+            setModalActive(false)
         }
     }, [nodes])
 
@@ -66,55 +73,41 @@ function CampaignBuilder() {
             coordinate: number[],
             type: DropdownType
         ) => {
-            console.log(
-                `Handle clicked ${id} at ${position} with data: and Type: ${type}`,
-                coordinate
-            );
             handleData = {
                 id: id,
                 position: position,
                 coordinate: coordinate,
                 type: type,
             };
-            setData(handleData);
-            setModalActive(true);
-            //   if (position == "Bottom") {
-            //     setShowSelectedPopup((prev) => !prev);
-            //   }
-        }, []);
+            setData(handleData)
 
-    // ✅ Memoize nodeTypes to avoid re-creation on every render
-    nodeType = useMemo(() => ({
-        text: (props) => <TextNode { ...props }
-            setNodes={ setNodes }
-            handleHandleClick={ handleHandleClick }
-            updateNode={ updateNode }
-        />
-    }), []);
+            if (getNodes()[0].id === id) {
+                setIsFirstNode(true)
+            } else if (getNodes()[0].id !== id) {
+                setIsFirstNode(false)
+            }
+            setModalActive(true)
+        }, []);
 
     // ✅ Memoize nodeTypes to avoid re-creation on every render
     nodeType = useMemo(
         () => ({
             text: (props) => (
-                <TextNode { ...props } setNodes={ setNodes } handleHandleClick={ handleHandleClick } />
+                <TextNode { ...props } copyNode={(node) => setCopyNode(node)} updateNode={ (id) => updateNodeData(id) } setNodes={ setNodes } handleHandleClick={ handleHandleClick } />
             ),
-        }),
-        [setNodes]
-    );
+        }), [setNodes]);
 
     edgeTypes = useMemo(
         () => ({
             button: (props) => <CustomEdge { ...props } />,
-        }),
-        []
-    );
+        }), []);
 
     const onConnect = useCallback(
         (params: any) => setEdges((eds) => addEdge(params, eds)),
         [setEdges]
     );
 
-    function handleClick(actions: ButtonActions) {
+    const handleClick = useCallback((actions: ButtonActions) => {
         switch (actions) {
             case ButtonActions.CANCEL:
                 setShowModal(false)
@@ -124,27 +117,27 @@ function CampaignBuilder() {
                 setShowContactSourceView(false)
                 break
             case ButtonActions.UPDATE:
-                nodes.map((node: any) => {
-                    if (node.id == nodeId) {
+                let allNodes = getNodes()
+                allNodes.map((node: any) => {
+                    if (node.id === nodeId) {
                         setModalType(node.mainModalType)
                         setMainModalItems(node.data.items)
                     }
                 })
-                setShowModal(true)
+
+                let indexOfNode = allNodes.findIndex(n => n.id === nodeId)
+                setEditedId(nodeId)
+                if (indexOfNode === 0) {
+                    setShowModal(true)
+                } else {
+                    setDecisionModalActive(true)
+                }
                 break
         }
-    }
+    }, [])
 
-    function updateNode(id: string) {
-        // const newText = prompt("Edit text:", data.label);
-        // if (newText?.length  ?? 0 > 0) {
-        //     setNodes((nds: any) =>
-        //         nds.map((node: any) =>
-        //             node.id === id ? { ...node, data: { ...node.data, label: newText } } : node
-        //         )
-        //     );
-        // }
-        setNodeId(id)
+    function updateNodeData(id: string) {
+        nodeId = id
         handleClick(ButtonActions.UPDATE)
     }
 
@@ -165,9 +158,8 @@ function CampaignBuilder() {
             style={ { background: "#fff", position: "fixed" } }
         >
             { showModal && (
-                // <ActionsModalView handleClick={action => handleClick(action)} />
                 <ModalView
-                    id={ nodeId }
+                    id={ editedId }
                     items={ mainModalItems }
                     type={ modalType }
                     handleClick={ (action) => handleClick(action) }
@@ -179,6 +171,8 @@ function CampaignBuilder() {
 
             { isModalActive && (
                 <SelectionPopup
+                    isFirstNode={isFirstNode}
+                    nodeCopy={copyNode}
                     parentNodeId={ data.id }
                     type={ data.type }
                     closeModal={ () => setModalActive(false) }
