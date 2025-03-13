@@ -18,15 +18,16 @@ import { nanoid } from "nanoid";
 import { DecisionsModalView } from "./DecisionsModalView/DecisionsModalView";
 
 interface Props {
-  isFirstNode: boolean
-  nodeCopy: {}
-  parentNodeId: string
-  closeModal: () => void
-  type: DropdownType.ACTION | DropdownType.CONDITION | DropdownType.DECISION
+  isFirstNode: boolean;
+  nodeCopy: {};
+  parentNodeId: string;
+  closeModal: () => void;
+  type: DropdownType.ACTION | DropdownType.CONDITION | DropdownType.DECISION;
   parentPosition: {
     x: number;
     y: number;
-  }
+  };
+  isNodeGettingEdited: boolean;
 }
 
 const SelectionPopup = ({
@@ -36,6 +37,7 @@ const SelectionPopup = ({
   type,
   parentNodeId = "",
   parentPosition,
+  isNodeGettingEdited,
 }: Props) => {
   const rootRef = useRef(null);
   const [selectedType, setSelectedType] = useState({
@@ -47,7 +49,7 @@ const SelectionPopup = ({
   });
 
   const [selectedItem, setSelectedItem] = useState("");
-  const [close, setClose] = useState(false);
+  const [openDecisionPopup, setOpenDecisionPopup] = useState(false);
   const { setNodes, setEdges } = useReactFlow();
   const [blocks, setBlocks] = useState([
     {
@@ -70,6 +72,9 @@ const SelectionPopup = ({
 
   useEffect(() => {
     console.log("popup type", type);
+    if (isNodeGettingEdited) {
+      setOpenDecisionPopup(true);
+    }
     if (
       type === DropdownType.ACTION ||
       type === DropdownType.CONDITION ||
@@ -105,149 +110,169 @@ const SelectionPopup = ({
   }, [type]);
 
   const openSelectionHandlePopup = (item: string) => {
-    setClose(true);
+    setOpenDecisionPopup(true);
     setSelectedItem(item);
   };
 
   const insertCopiedNode = () => {
-    setNodes((prevNodes) => prevNodes.splice(1, 0, nodeCopy))
-  }
+    setNodes((prevNodes) => prevNodes.splice(1, 0, nodeCopy));
+  };
 
   const onChangeHandler = (name: string) => {
-    const id = nanoid();
-    setNodes((prevNodes) => [
-      ...prevNodes,
-      {
-        parentId: parentNodeId,
-        id: id,
-        type: "text",
-        connectable: true,
-        position: {
-          x: parentPosition.x,
-          y: parentPosition.y,
+    if (isNodeGettingEdited) {
+      //hironmay ka code
+    } else {
+      const id = nanoid();
+      console.log("for new node", parentNodeId, parentPosition, selectedType);
+      setNodes((prevNodes) => [
+        ...prevNodes,
+        {
+          parentId: parentNodeId,
+          id: id,
+          type: "text",
+          connectable: true,
+          position: {
+            x: parentPosition.x,
+            y: parentPosition.y,
+          },
+          data: {
+            label: name,
+            type: selectedType.type,
+          },
         },
-        data: {
-          label: name,
-          type: selectedType.type,
-        },
-      },
-    ]);
+      ]);
 
-    setEdges((prevEdges) => [
-      ...prevEdges,
-      {
-        id: `e${parentNodeId}-${id}`,
-        source: parentNodeId,
-        target: id,
-        type: "smoothstep",
-        zIndex: 11,
-        animated: true,
-        labelBgStyle: { fill: "#fff", fillOpacity: 0.7 },
-        labelBgPadding: [2, 4],
-        labelBgBorderRadius: 4,
-      },
-    ]);
-    closeModal();
+      setEdges((prevEdges) => [
+        ...prevEdges,
+        {
+          id: `e${parentNodeId}-${id}`,
+          source: parentNodeId,
+          target: id,
+          type: "smoothstep",
+          zIndex: 11,
+          animated: true,
+          labelBgStyle: { fill: "#fff", fillOpacity: 0.7 },
+          labelBgPadding: [2, 4],
+          labelBgBorderRadius: 4,
+        },
+      ]);
+      closeModal();
+    }
   };
 
   return (
     <div
-      style={ {
+      style={{
         //top: "calc(100% + 20px)",
         top: parentPosition.y + 20,
         left: parentPosition.x / 2,
         position: "relative",
         zIndex: 1000,
-      } }
+      }}
     >
-      { selectedType.buttonText.length > 0 ? (
+      {selectedType.buttonText.length > 0 ? (
+        // <SelectDropdown onChange={onChangeHandler} />
         <DropdownView
-          position={ [parentPosition.y + 20, parentPosition.x] }
-          parentId={ parentNodeId }
-          dropdownProps={ {
+          parentId={parentNodeId}
+          dropdownProps={{
             dropdownType: selectedType.type,
             dropdownColor: selectedType.color,
-          } }
-          parentPosition={ parentPosition }
-          selectedOption={ (item: string) => openSelectionHandlePopup(item) }
-          backBtn={ () => setSelectedType({ ...selectedItem, buttonText: "" }) }
+          }}
+          parentPosition={parentPosition}
+          selectedOption={(item: string) => openSelectionHandlePopup(item)}
+          backBtn={() => setSelectedType({ ...selectedItem, buttonText: "" })}
         />
       ) : (
-        <>
-          <SimpleGrid
-            ref={ rootRef }
-            spacing={ 4 }
-            justifyContent="center"
-            display="flex"
-            templateColumns="repeat(3, minmax(200px, 1fr))"
-            maxW={ 250 * 3 }
-            padding={ 5 }
-          >
-            { blocks.map((block, index) => (
-              <Card
-                key={ index }
-                maxW="sm"
-                borderWidth="1px"
-                borderRadius="lg"
-                borderColor={ block.color }
-                style={ { cursor: "pointer", width: "250px" } }
-              >
-                <CardHeader style={ { background: block.color, color: "white" } }>
-                  <Heading as="h3" size="md">
-                    { block.title }
-                  </Heading>
-                </CardHeader>
-                <CardBody>
-                  <Text>{ block.description }</Text>
-                </CardBody>
-                <CardFooter>
-                  <Button
-                    onClick={ () => [setSelectedType(block)] }
-                    colorScheme="blue"
-                  >
-                    { block.buttonText }
-                  </Button>
-                </CardFooter>
-              </Card>
-            )) }
-          </SimpleGrid>
-
-          { isFirstNode && Object.keys(nodeCopy).length > 0 && (
-            <Box
-              border="1px solid"
-              borderColor="gray.200"
-              borderRadius="md"
-              boxShadow="sm"
-              p={ 4 }
-              position="relative"
-                w={248 * 3}
+        isNodeGettingEdited === false && (
+          <>
+            <SimpleGrid
+              ref={rootRef}
+              spacing={4}
+              justifyContent="center"
+              display="flex"
+              templateColumns="repeat(3, minmax(200px, 1fr))"
+              maxW={250 * 3}
+              padding={5}
             >
-              <Box
-                h="3px"
-                bgGradient="linear(to-r, teal.300, blue.500, orange.400)"
-                borderTopRadius="md"
-                mb={ 4 }
-              />
+              {blocks.map((block, index) => (
+                <Card
+                  key={index}
+                  maxW="sm"
+                  borderWidth="1px"
+                  borderRadius="lg"
+                  borderColor={block.color}
+                  style={{ cursor: "pointer", width: "250px" }}
+                >
+                  <CardHeader
+                    style={{ background: block.color, color: "white" }}
+                  >
+                    <Heading as="h3" size="md">
+                      {block.title}
+                    </Heading>
+                  </CardHeader>
+                  <CardBody>
+                    <Text>{block.description}</Text>
+                  </CardBody>
+                  <CardFooter>
+                    <Button
+                      onClick={() => [setSelectedType(block)]}
+                      colorScheme="blue"
+                    >
+                      {block.buttonText}
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </SimpleGrid>
 
-              <Flex justify="space-between" align="center">
-                <Box>
-                  <Text fontWeight="bold">Insert cloned event here</Text>
-                  <Text color="gray.500">Name: lkjhk</Text>
-                  <Text color="gray.500">From: New campaign</Text>
-                </Box>
-                <Button onClick={() => insertCopiedNode()} textColor="gray.900" size="sm" bg={"rgb(231, 231, 231)"} variant="outline">Insert</Button>
-              </Flex>
-            </Box>
-          ) }
-        </>
-      ) }
-      { close && (
+            {isFirstNode && Object.keys(nodeCopy).length > 0 && (
+              <Box
+                border="1px solid"
+                borderColor="gray.200"
+                borderRadius="md"
+                boxShadow="sm"
+                p={4}
+                position="relative"
+                w={248 * 3}
+              >
+                <Box
+                  h="3px"
+                  bgGradient="linear(to-r, teal.300, blue.500, orange.400)"
+                  borderTopRadius="md"
+                  mb={4}
+                />
+
+                <Flex justify="space-between" align="center">
+                  <Box>
+                    <Text fontWeight="bold">Insert cloned event here</Text>
+                    <Text color="gray.500">Name: lkjhk</Text>
+                    <Text color="gray.500">From: New campaign</Text>
+                  </Box>
+                  <Button
+                    onClick={() => insertCopiedNode()}
+                    textColor="gray.900"
+                    size="sm"
+                    bg={"rgb(231, 231, 231)"}
+                    variant="outline"
+                  >
+                    Insert
+                  </Button>
+                </Flex>
+              </Box>
+            )}
+          </>
+        )
+      )}
+      {openDecisionPopup && (
         <DecisionsModalView
-          close={ () => setClose(false) }
-          add={ (name: string) => onChangeHandler(name) }
-          popupType={ selectedItem }
+          close={() => setOpenDecisionPopup(false)}
+          add={(name: string) => onChangeHandler(name)}
+          popupType={selectedItem}
+          id={""}
+          type={""}
+          items={[]}
         />
-      ) }
+      )}
     </div>
   );
 };
