@@ -20,10 +20,10 @@ interface Props {
     modalType: string,
     selectedItem: string,
     parentId: string,
-    dropdownProps: { dropdownType: DropdownType; dropdownColor: string },
-    parentPosition: { x: number; y: number }
+    dropdownProps: { dropdownType: DropdownType; dropdownColor: string }
   ) => void;
   backBtn: () => void
+  closeDropdown: () => void
 }
 
 let data: string[] = [];
@@ -33,7 +33,8 @@ function DropdownView({
   dropdownProps,
   parentPosition,
   selectedOption,
-  backBtn
+  backBtn,
+  closeDropdown
 }: Props) {
   const [showInputView, setShowInputView] = useState(true);
   const [inputValue, setInputValue] = useState("");
@@ -42,7 +43,6 @@ function DropdownView({
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    console.log(dropdownProps.dropdownType);
     switch (dropdownProps.dropdownType) {
       case DropdownType.ACTION:
         data = contactActions;
@@ -195,14 +195,15 @@ function DropdownView({
                       background: hoveredIndex === index ? "red" : "",
                     } }
                     onClick={ () =>
-                      selectedOption(
+                      [selectedOption(
                         item,
                         parentId,
                         dropdownProps,
                         parentPosition
-                      )
+                      ),
+                      closeDropdown()
+                    ]
                     }
-                    // onClick={() => [handleItemClick(), handleClickedItem(item)]}
                     onMouseEnter={ () => setHoveredIndex(index) }
                     onMouseLeave={ () => setHoveredIndex(null) }
                   // onClick={ () => setOpenModal(true) }

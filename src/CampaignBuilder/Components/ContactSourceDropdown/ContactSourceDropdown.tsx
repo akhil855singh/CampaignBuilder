@@ -14,7 +14,6 @@ function ContactSourceDropdown({ handleItemClick }: Props) {
   const [inputValue, setInputValue] = useState("");
   const [filteredData, setFilteredData] = useState(data);
   const [hoveredIndex, setHoveredIndex] = useState(0);
-  const { setNodes } = useReactFlow();
   const dropdownRef = useRef(null);
 
   const handleClickOutside = (event) => {
@@ -22,24 +21,6 @@ function ContactSourceDropdown({ handleItemClick }: Props) {
       setShowInputView(false);
     }
   };
-
-  // ✅ Memoize nodeTypes to avoid re-creation on every render
-  function handleClickedItem(item: String) {
-    setNodes((prevNodes) => [
-      ...prevNodes,
-      {
-        id: nanoid(),
-        type: "text",
-        position: {
-          x: screen.width / 2.5,
-          y: screen.height / 4,
-        },
-        data: {
-          label: item,
-        },
-      },
-    ]);
-  }
 
   return (
     <div

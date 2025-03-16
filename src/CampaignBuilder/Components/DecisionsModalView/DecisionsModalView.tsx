@@ -25,18 +25,16 @@ import { ChevronDownIcon } from "@chakra-ui/icons";
 import { XCircle } from "lucide-react";
 import { InfoIcon } from "@chakra-ui/icons";
 import { ActionsTypes, DecisionsTypes } from "../../../Constants/enums";
-import { categories, getPopUpHeaderText } from "./DecisionsModalViewModal";
+import { categories, CustomFormFieldProps, ExpandableTextAreaProps, getPopUpHeaderText, MultiSelectFieldProps, SingleSelectProps } from "./DecisionsModalViewModal";
 interface Props {
-  id: string
-  type: string
-  items: string[]
+  // type: string
+  // items: string[]
   close: () => void;
   add: (item: string) => void;
   popupType: string;
 }
 
 const DecisionsModalView = ({ close, add, popupType }: Props) => {
-  // const [popupType, setPopUpType] = useState(DecisionsTypes.DEVICE_VISIT);
   const { title, description } = getPopUpHeaderText(popupType);
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
     deviceTypes: [],
@@ -55,7 +53,7 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
     addTags: [],
     removeTags: [],
   });
-  console.log(popupType);
+
   // Generic function to handle selection
   const handleSelect = (category: string, value: string) => {
     setSelectedItems((prev) => ({
@@ -76,12 +74,6 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
     }));
   };
 
-  interface CustomFormFieldProps {
-    label: string;
-    placeholder: string;
-    labelColor?: string;
-    icon?: React.ReactNode;
-  }
   const CustomFormField: React.FC<CustomFormFieldProps> = ({
     label,
     placeholder,
@@ -99,23 +91,13 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
     </FormControl>
   );
 
-  const CustomFormFieldWithOutSpan: React.FC<CustomFormFieldProps> = ({ label, placeholder }) => <FormControl mt={4}>
+  const CustomFormFieldWithOutSpan: React.FC<CustomFormFieldProps> = ({ label, placeholder }) => <FormControl mt={ 4 }>
     <FormLabel color="black">
-      {label}
+      { label }
     </FormLabel>
-    <Input placeholder={placeholder || "Enter value"} />
+    <Input placeholder={ placeholder || "Enter value" } />
   </FormControl>
 
-  // Define TypeScript types for props
-  interface MultiSelectFieldProps {
-    label: string;
-    categoryKey: string;
-    selectedItems: Record<string, string[]>; // Generic object with string arrays
-    handleSelect: (categoryKey: string, value: string) => void;
-    handleRemove: (categoryKey: string, value: string) => void;
-    options: string[];
-    showspan: boolean;
-  }
   const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
     label,
     categoryKey,
@@ -171,10 +153,6 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
       </Flex>
     </FormControl>
   );
-  interface ExpandableTextAreaProps {
-    label: string;
-    placeholder?: string;
-  }
 
   const ExpandableTextArea: React.FC<ExpandableTextAreaProps> = ({
     label,
@@ -195,12 +173,7 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
       </FormControl>
     );
   };
-  interface SingleSelectProps {
-    label: string;
-    options: string[];
-    placeholder?: string;
-    onChange?: (value: string) => void;
-  }
+
   const SingleSelect: React.FC<SingleSelectProps> = ({
     label,
     options,
@@ -246,22 +219,22 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
             )) }
           </Select>
 
-           {/* Show Clear Button when a value is selected */}
-           {selectedValue && (
+          {/* Show Clear Button when a value is selected */ }
+          { selectedValue && (
             <InputRightElement width="4.5rem">
-              <Flex align="center" gap={1}>
-                {/* Clear Selection Icon (XCircle) */}
+              <Flex align="center" gap={ 1 }>
+                {/* Clear Selection Icon (XCircle) */ }
                 <IconButton
-                  icon={<XCircle size={16} />}
+                  icon={ <XCircle size={ 16 } /> }
                   aria-label="Clear selection"
                   size="xs"
                   variant="ghost"
-                  onClick={handleClear}
+                  onClick={ handleClear }
                 />
 
               </Flex>
             </InputRightElement>
-          )}
+          ) }
         </InputGroup>
       </FormControl>
     );
@@ -281,7 +254,6 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
     >
       <Box top={ 20 } bg="white" p={ 6 } rounded="md" boxShadow="lg" w="600px">
         {/* Title */ }
-
         <Text fontSize="xl" color="black" fontWeight="bold">
           { title }
         </Text>
@@ -426,7 +398,10 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
           <ExpandableTextArea
             label="Reason"
             placeholder="Enter your reason here..."
-          />
+          >
+
+            <h1 style={ { color: "#000" } }>Hello</h1>
+          </ExpandableTextArea>
         ) }
 
         { popupType === ActionsTypes.ADD_TO_COMPANY_SCORE && (
@@ -492,391 +467,391 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
             onChange={ (value) => console.log("Selected:", value) }
           />
         ) }
-        {popupType === ActionsTypes.CHANGE_CONTACT_STAGE
+        { popupType === ActionsTypes.CHANGE_CONTACT_STAGE
           &&
           <SingleSelect
             label="Select stage"
-            options={categories.selectStage}
+            options={ categories.selectStage }
             placeholder="Choose one..."
-            onChange={(value) => console.log("Selected:", value)}
+            onChange={ (value) => console.log("Selected:", value) }
           />
         }
-        {popupType === ActionsTypes.JUMP_TO_EVENT
+        { popupType === ActionsTypes.JUMP_TO_EVENT
           &&
           <SingleSelect
             label="Event to jump to"
-            options={categories.jumpToEvent}
+            options={ categories.jumpToEvent }
             placeholder="Choose one..."
-            onChange={(value) => console.log("Selected:", value)}
+            onChange={ (value) => console.log("Selected:", value) }
           />
         }
-        {popupType === ActionsTypes.MODIFY_CONTACT_SEGMENTS
+        { popupType === ActionsTypes.MODIFY_CONTACT_SEGMENTS
           &&
           <MultiSelectField
             label="Add contact to selected segment(s)"
             categoryKey="addContactToSelectedSegment"
-            selectedItems={selectedItems}
-            handleSelect={handleSelect}
-            handleRemove={handleRemove}
-            options={categories.addContactToSelectedSegment}
-            showspan={false}
+            selectedItems={ selectedItems }
+            handleSelect={ handleSelect }
+            handleRemove={ handleRemove }
+            options={ categories.addContactToSelectedSegment }
+            showspan={ false }
           />
         }
-        {popupType === ActionsTypes.MODIFY_CONTACT_SEGMENTS
+        { popupType === ActionsTypes.MODIFY_CONTACT_SEGMENTS
           &&
           <MultiSelectField
             label="Remove contact from selected segment(s)"
             categoryKey="removeContactFromSelectedSegment"
-            selectedItems={selectedItems}
-            handleSelect={handleSelect}
-            handleRemove={handleRemove}
-            options={categories.removeContactFromSelectedSegment}
-            showspan={false}
+            selectedItems={ selectedItems }
+            handleSelect={ handleSelect }
+            handleRemove={ handleRemove }
+            options={ categories.removeContactFromSelectedSegment }
+            showspan={ false }
           />
         }
 
-        {popupType === ActionsTypes.MODIFY_CONTACT_TAGS
+        { popupType === ActionsTypes.MODIFY_CONTACT_TAGS
           &&
           <MultiSelectField
             label="Add tags"
             categoryKey="addTags"
-            selectedItems={selectedItems}
-            handleSelect={handleSelect}
-            handleRemove={handleRemove}
-            options={categories.addTags}
-            showspan={false}
+            selectedItems={ selectedItems }
+            handleSelect={ handleSelect }
+            handleRemove={ handleRemove }
+            options={ categories.addTags }
+            showspan={ false }
           />
         }
-        {popupType === ActionsTypes.MODIFY_CONTACT_TAGS
+        { popupType === ActionsTypes.MODIFY_CONTACT_TAGS
           &&
           <MultiSelectField
             label="Remove tags"
             categoryKey="removeTags"
-            selectedItems={selectedItems}
-            handleSelect={handleSelect}
-            handleRemove={handleRemove}
-            options={categories.removeTags}
-            showspan={false}
+            selectedItems={ selectedItems }
+            handleSelect={ handleSelect }
+            handleRemove={ handleRemove }
+            options={ categories.removeTags }
+            showspan={ false }
           />
         }
 
-        {popupType === ActionsTypes.PUSH_CONTACT_TO_INTEGRATION
+        { popupType === ActionsTypes.PUSH_CONTACT_TO_INTEGRATION
           &&
           <SingleSelect
             label="Integration"
-            options={categories.integration}
+            options={ categories.integration }
             placeholder="Choose one..."
-            onChange={(value) => console.log("Selected:", value)}
+            onChange={ (value) => console.log("Selected:", value) }
           />
         }
-        {popupType === ActionsTypes.REMOVE_DO_NOT_CONTACT
+        { popupType === ActionsTypes.REMOVE_DO_NOT_CONTACT
           &&
           <MultiSelectField
             label="Channels"
             categoryKey="channel"
-            selectedItems={selectedItems}
-            handleSelect={handleSelect}
-            handleRemove={handleRemove}
-            options={categories.channel}
-            showspan={false}
+            selectedItems={ selectedItems }
+            handleSelect={ handleSelect }
+            handleRemove={ handleRemove }
+            options={ categories.channel }
+            showspan={ false }
           />
         }
 
-        {popupType === ActionsTypes.SEND_APP_PUSH_MESSAGE
+        { popupType === ActionsTypes.SEND_APP_PUSH_MESSAGE
           &&
           <SingleSelect
             label="Select Message"
-            options={categories.selectMessage}
+            options={ categories.selectMessage }
             placeholder="Search Option..."
-            onChange={(value) => console.log("Selected:", value)}
+            onChange={ (value) => console.log("Selected:", value) }
           />
         }
 
-        {popupType === ActionsTypes.UPDATE_CONTACT_OWNER
+        { popupType === ActionsTypes.UPDATE_CONTACT_OWNER
           &&
           <SingleSelect
             label="Add to the following:"
-            options={categories.selectMessage}
+            options={ categories.selectMessage }
             placeholder="Search Option..."
-            onChange={(value) => console.log("Selected:", value)}
+            onChange={ (value) => console.log("Selected:", value) }
           />
         }
 
-        {popupType === ActionsTypes.SEND_MARKETING_MESSAGE
+        { popupType === ActionsTypes.SEND_MARKETING_MESSAGE
           &&
           <SingleSelect
             label="Select a marketing message"
-            options={categories.selectAMarketingMessage}
+            options={ categories.selectAMarketingMessage }
             placeholder="Search Option..."
-            onChange={(value) => console.log("Selected:", value)}
+            onChange={ (value) => console.log("Selected:", value) }
           />
         }
-        {popupType === ActionsTypes.SEND_RCSBOT_MESSAGE
+        { popupType === ActionsTypes.SEND_RCSBOT_MESSAGE
           &&
           <SingleSelect
             label="Select Message "
-            options={categories.selectMessage}
+            options={ categories.selectMessage }
             placeholder="Search Option..."
-            onChange={(value) => console.log("Selected:", value)}
+            onChange={ (value) => console.log("Selected:", value) }
           />
         }
-        {popupType === ActionsTypes.SEND_RCS_MESSAGE
+        { popupType === ActionsTypes.SEND_RCS_MESSAGE
           &&
           <SingleSelect
             label="Select Message "
-            options={categories.selectMessage}
+            options={ categories.selectMessage }
             placeholder="Search Option..."
-            onChange={(value) => console.log("Selected:", value)}
+            onChange={ (value) => console.log("Selected:", value) }
           />
         }
-        {popupType === ActionsTypes.SEND_TEXT_MESSAGE
+        { popupType === ActionsTypes.SEND_TEXT_MESSAGE
           &&
           <SingleSelect
             label="Select Message "
-            options={categories.selectMessage}
+            options={ categories.selectMessage }
             placeholder="Search Option..."
-            onChange={(value) => console.log("Selected:", value)}
+            onChange={ (value) => console.log("Selected:", value) }
           />
         }
-        {popupType === ActionsTypes.SEND_TEXT_MESSAGE
+        { popupType === ActionsTypes.SEND_TEXT_MESSAGE
           &&
           <SingleSelect
             label="Select Message "
-            options={categories.selectMessage}
+            options={ categories.selectMessage }
             placeholder="Search Option..."
-            onChange={(value) => console.log("Selected:", value)}
+            onChange={ (value) => console.log("Selected:", value) }
           />
         }
-        {popupType === ActionsTypes.SEND_WEBPUSH_MESSAGE
+        { popupType === ActionsTypes.SEND_WEBPUSH_MESSAGE
           &&
           <SingleSelect
             label="Select Message "
-            options={categories.selectMessage}
+            options={ categories.selectMessage }
             placeholder="Search Option..."
-            onChange={(value) => console.log("Selected:", value)}
+            onChange={ (value) => console.log("Selected:", value) }
           />
         }
-        {popupType === ActionsTypes.SEND_WHATSAPPBOT_MESSAGE
+        { popupType === ActionsTypes.SEND_WHATSAPPBOT_MESSAGE
           &&
           <SingleSelect
             label="Select Message "
-            options={categories.selectMessage}
+            options={ categories.selectMessage }
             placeholder="Search Option..."
-            onChange={(value) => console.log("Selected:", value)}
+            onChange={ (value) => console.log("Selected:", value) }
           />
         }
-        {popupType === ActionsTypes.SEND_WHATSAPP_MESSAGE
+        { popupType === ActionsTypes.SEND_WHATSAPP_MESSAGE
           &&
           <SingleSelect
             label="Select Message "
-            options={categories.selectMessage}
+            options={ categories.selectMessage }
             placeholder="Search Option..."
-            onChange={(value) => console.log("Selected:", value)}
+            onChange={ (value) => console.log("Selected:", value) }
           />
         }
-        {popupType === ActionsTypes.UPDATE_CONTACT
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="vernac language" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="vernac language" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Account Type" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Account Type" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="TriggerInstantCommunication" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="TriggerInstantCommunication" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Due Date" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Due Date" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Account Balance amount" placeholder="" ></CustomFormFieldWithOutSpan>}
+          <CustomFormFieldWithOutSpan label="Account Balance amount" placeholder="" ></CustomFormFieldWithOutSpan> }
 
-        {popupType === ActionsTypes.UPDATE_CONTACT
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Account Status" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Account Status" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Dormant/Inactive Since" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Dormant/Inactive Since" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Date of birth" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Date of birth" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Onboarding Date" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Onboarding Date" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Expiry_date" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Expiry_date" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="DOB" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="DOB" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="webpush_activated" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="webpush_activated" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Gender" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Gender" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="apppush_activated" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="apppush_activated" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Middle Name" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Middle Name" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Hobbies" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Hobbies" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Title" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Title" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="First Name" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="First Name" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Last Name" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Last Name" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Primary company" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Primary company" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="father name" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="father name" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Position" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Position" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Customer ID" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Customer ID" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Email" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Email" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Mobile" placeholder="" ></CustomFormFieldWithOutSpan>}
+          <CustomFormFieldWithOutSpan label="Mobile" placeholder="" ></CustomFormFieldWithOutSpan> }
 
-        {popupType === ActionsTypes.UPDATE_CONTACT
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Phone" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Phone" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Points" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Points" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Points" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Points" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Fax" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Fax" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Mother Name" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Mother Name" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Address Line 1" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Address Line 1" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Address Line 2" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Address Line 2" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="City" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="City" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="State" placeholder="" ></CustomFormFieldWithOutSpan>}
+          <CustomFormFieldWithOutSpan label="State" placeholder="" ></CustomFormFieldWithOutSpan> }
 
-        {popupType === ActionsTypes.UPDATE_CONTACT
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Zip Code" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Zip Code" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Country" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Country" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Preferred Locale" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Preferred Locale" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Preferred Timezone" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Preferred Timezone" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Date Last Active" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Date Last Active" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Attribution Date" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Attribution Date" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Attribution" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Attribution" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Website" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Website" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Facebook" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Facebook" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Foursquare" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Foursquare" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Instagram" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Instagram" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="LinkedIn" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="LinkedIn" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Skype" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT
+          <CustomFormFieldWithOutSpan label="Skype" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT
           &&
-          <CustomFormFieldWithOutSpan label="Twitter" placeholder="" ></CustomFormFieldWithOutSpan>}
+          <CustomFormFieldWithOutSpan label="Twitter" placeholder="" ></CustomFormFieldWithOutSpan> }
 
 
-        {popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
+        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
           &&
-          <CustomFormFieldWithOutSpan label="Address 1" placeholder="" ></CustomFormFieldWithOutSpan>}
+          <CustomFormFieldWithOutSpan label="Address 1" placeholder="" ></CustomFormFieldWithOutSpan> }
 
-        {popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
+        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
           &&
-          <CustomFormFieldWithOutSpan label="Address 2" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
+          <CustomFormFieldWithOutSpan label="Address 2" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
           &&
-          <CustomFormFieldWithOutSpan label="Company Email" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
+          <CustomFormFieldWithOutSpan label="Company Email" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
           &&
-          <CustomFormFieldWithOutSpan label="Phone" placeholder="" ></CustomFormFieldWithOutSpan>}
+          <CustomFormFieldWithOutSpan label="Phone" placeholder="" ></CustomFormFieldWithOutSpan> }
 
-        {popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
+        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
           &&
-          <CustomFormFieldWithOutSpan label="City" placeholder="" ></CustomFormFieldWithOutSpan>}
+          <CustomFormFieldWithOutSpan label="City" placeholder="" ></CustomFormFieldWithOutSpan> }
 
-        {popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
+        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
           &&
-          <CustomFormFieldWithOutSpan label="State" placeholder="" ></CustomFormFieldWithOutSpan>}
+          <CustomFormFieldWithOutSpan label="State" placeholder="" ></CustomFormFieldWithOutSpan> }
 
-        {popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
+        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
           &&
-          <CustomFormFieldWithOutSpan label="Zip Code" placeholder="" ></CustomFormFieldWithOutSpan>}
+          <CustomFormFieldWithOutSpan label="Zip Code" placeholder="" ></CustomFormFieldWithOutSpan> }
 
-        {popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
+        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
           &&
-          <CustomFormFieldWithOutSpan label="Country" placeholder="" ></CustomFormFieldWithOutSpan>}
+          <CustomFormFieldWithOutSpan label="Country" placeholder="" ></CustomFormFieldWithOutSpan> }
 
-        {popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
+        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
           &&
-          <CustomFormFieldWithOutSpan label="Company Name" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
+          <CustomFormFieldWithOutSpan label="Company Name" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
           &&
-          <CustomFormFieldWithOutSpan label="Website" placeholder="" ></CustomFormFieldWithOutSpan>}
+          <CustomFormFieldWithOutSpan label="Website" placeholder="" ></CustomFormFieldWithOutSpan> }
 
-        {popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
+        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
           &&
-          <CustomFormFieldWithOutSpan label="Number of Employees" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
+          <CustomFormFieldWithOutSpan label="Number of Employees" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
           &&
-          <CustomFormFieldWithOutSpan label="Fax" placeholder="" ></CustomFormFieldWithOutSpan>}
-        {popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
+          <CustomFormFieldWithOutSpan label="Fax" placeholder="" ></CustomFormFieldWithOutSpan> }
+        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
           &&
-          <CustomFormFieldWithOutSpan label="Annual Revenue" placeholder="" ></CustomFormFieldWithOutSpan>}
+          <CustomFormFieldWithOutSpan label="Annual Revenue" placeholder="" ></CustomFormFieldWithOutSpan> }
 
-        {popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
+        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
           &&
-          <CustomFormFieldWithOutSpan label="Industry" placeholder="" ></CustomFormFieldWithOutSpan>}
+          <CustomFormFieldWithOutSpan label="Industry" placeholder="" ></CustomFormFieldWithOutSpan> }
 
-        {popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
+        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY
           &&
-          <CustomFormFieldWithOutSpan label="Description" placeholder="" ></CustomFormFieldWithOutSpan>}
+          <CustomFormFieldWithOutSpan label="Description" placeholder="" ></CustomFormFieldWithOutSpan> }
 
 
 
@@ -890,7 +865,7 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
           >
             ✖ Cancel
           </Button>
-          <Button onClick={ () => [add(selectedName), close] } colorScheme="blue">
+          <Button onClick={ () => [add(selectedName), close()] } colorScheme="blue">
             + Add
           </Button>
         </Flex>

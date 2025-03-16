@@ -1,5 +1,34 @@
 import { ActionsTypes, DecisionsTypes } from "../../../Constants/enums";
 
+interface CustomFormFieldProps {
+    label: string;
+    placeholder: string;
+    labelColor?: string;
+    icon?: React.ReactNode;
+}
+
+interface MultiSelectFieldProps {
+    label: string;
+    categoryKey: string;
+    selectedItems: Record<string, string[]>; // Generic object with string arrays
+    handleSelect: (categoryKey: string, value: string) => void;
+    handleRemove: (categoryKey: string, value: string) => void;
+    options: string[];
+    showspan: boolean;
+}
+
+interface ExpandableTextAreaProps {
+  label: string;
+  placeholder?: string;
+}
+
+interface SingleSelectProps {
+  label: string;
+  options: string[];
+  placeholder?: string;
+  onChange?: (value: string) => void;
+}
+
 const contactDecisions = [
   "Device visit",
   "Downloads asset",
@@ -125,4 +154,10 @@ export {
   contactDecisions,
   categories,
   getPopUpHeaderText
+};
+export type { 
+  CustomFormFieldProps,
+  MultiSelectFieldProps,
+  ExpandableTextAreaProps,
+  SingleSelectProps
 }

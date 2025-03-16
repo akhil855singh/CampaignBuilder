@@ -5,7 +5,8 @@ import { PiCopySimple } from "react-icons/pi";
 import { nanoid } from "nanoid";
 
 interface Props {
-  id: string;
+  parentId: string
+  id: string
   data: {
     label: string;
     type: DropdownType.ACTION | DropdownType.CONDITION | DropdownType.DECISION;
@@ -21,9 +22,11 @@ interface Props {
   ) => void;
   updateNode: (id: string) => void
   copyNode: (node: Node) => void
+  selectionViewActive: (is: boolean) => void
 }
 
 function TextNode({
+  parentId,
   id,
   data,
   setNodes,
@@ -31,10 +34,10 @@ function TextNode({
   positionAbsoluteY,
   handleHandleClick,
   updateNode,
-  copyNode
+  copyNode,
+  selectionViewActive
 }: Props) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isModalActive, setModalActive] = useState(false);
   const { getNodes } = useReactFlow()
 
   const handleClick = useCallback((
@@ -127,6 +130,7 @@ function TextNode({
             onClick={ (e) => {
               e.preventDefault();
               handleClick(id, "BottomLeft", [e.clientX, e.clientY], data.type);
+              selectionViewActive(true)
             } }
           />
           <Handle
@@ -137,6 +141,7 @@ function TextNode({
             onClick={ (e) => {
               e.preventDefault();
               handleClick(id, "BottomRight", [e.clientX, e.clientY], data.type);
+              selectionViewActive(true)
             } }
           />
         </div>
@@ -150,6 +155,7 @@ function TextNode({
           onClick={ (e) => {
             e.preventDefault();
             handleClick(id, "Bottom", [e.clientX, e.clientY], data.type);
+            selectionViewActive(true)
           } }
         />
       ) }
@@ -176,7 +182,7 @@ function TextNode({
       ) }
 
       {/* Node Content */ }
-      <p style={ { color: "#000" } }>{ data.label }</p>
+      <p style={ { color: "#000", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", width: 150 } }>{ data.label }</p>
 
       {/* Edit & Delete Buttons */ }
       { isHovered && (
@@ -189,25 +195,27 @@ function TextNode({
             gap: 2,
           } }
         >
-          <button
-            onClick={ () => handleCopyNode() }
-            style={ {
-              background: "#357ABD",
-              color: "white",
-              border: "none",
-              borderRadius: "50%",
-              width: 20,
-              height: 20,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 14,
-              fontWeight: "bold",
-            } }
-          >
-            <PiCopySimple />
-          </button>
+          { parentId?.length > 0 && (
+            <button
+              onClick={ () => handleCopyNode() }
+              style={ {
+                background: "#357ABD",
+                color: "white",
+                border: "none",
+                borderRadius: "50%",
+                width: 20,
+                height: 20,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 14,
+                fontWeight: "bold",
+              } }
+            >
+              <PiCopySimple />
+            </button>
+          ) }
           <button
             onClick={ () => updateNode(id) }
             style={ {
@@ -247,18 +255,6 @@ function TextNode({
             ✖
           </button>
         </div>
-      ) }
-
-      { isModalActive && (
-        <SelectionPopup
-          parentNodeId={ id }
-          type={ data.type }
-          closeModal={ () => setModalActive(false) }
-          parentPosition={ {
-            x: positionAbsoluteX,
-            y: positionAbsoluteY,
-          } }
-        />
       ) }
     </div>
   );
