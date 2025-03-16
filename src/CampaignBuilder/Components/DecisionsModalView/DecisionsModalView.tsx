@@ -16,15 +16,21 @@ import {
   Flex,
   Textarea,
   Icon,
-  InputGroup,
   Select,
+  InputGroup,
   InputRightElement,
   IconButton,
+  Checkbox,
+  InputLeftElement,
+  Stack,
+  RadioGroup,
+  HStack,
 } from "@chakra-ui/react";
+import RSelect, { SingleValue } from "react-select";
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import { XCircle } from "lucide-react";
+import { Radio, XCircle } from "lucide-react";
 import { InfoIcon } from "@chakra-ui/icons";
-import { ActionsTypes, DecisionsTypes } from "../../../Constants/enums";
+import { ActionsTypes, ConditionsTypes, DecisionsTypes } from "../../../Constants/enums";
 import { categories, CustomFormFieldProps, ExpandableTextAreaProps, getPopUpHeaderText, MultiSelectFieldProps, SingleSelectProps } from "./DecisionsModalViewModal";
 interface Props {
   // type: string
@@ -34,8 +40,17 @@ interface Props {
   popupType: string;
 }
 
+const options = [
+  { value: "minutes", label: "minute(s)" },
+  { value: "hours", label: "hour(s)" },
+  { value: "days", label: "day(s)" },
+  { value: "months", label: "month(s)" },
+  { value: "years", label: "year(s)" },
+];
+
 const DecisionsModalView = ({ close, add, popupType }: Props) => {
   const { title, description } = getPopUpHeaderText(popupType);
+  const [filterEnabled, setFilterEnabled] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
     deviceTypes: [],
     deviceBrands: [],
@@ -65,6 +80,12 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
   };
 
   const [selectedName, setSelectedName] = useState("");
+  const [executionType, setExecutionType] = useState("relative");
+  const [selectedOption, setSelectedOption] = useState<{ value: string; label: string } | null>(options[2]);
+
+  const handleChange = (selected: SingleValue<{ value: string; label: string }>) => {
+    setSelectedOption(selected); // Ensure it correctly handles null values
+  };
 
   // Generic function to remove selection
   const handleRemove = (category: string, value: string) => {
@@ -74,6 +95,139 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
     }));
   };
 
+  const customStyles = {
+    control: (provided: any) => ({
+      ...provided,
+      backgroundColor: "#fff",
+      borderRadius: "8px",
+      borderColor: "#ccc",
+      boxShadow: "none",
+      "&:hover": {
+        borderColor: "#888",
+      },
+    }),
+    menu: (provided: any) => ({
+      ...provided,
+      backgroundColor: "white",
+      borderRadius: "8px",
+      border: "1px solid #ccc",
+    }),
+    option: (provided: any, state: any) => ({
+      ...provided,
+      backgroundColor: state.isSelected ? "red" : "white",
+      color: state.isSelected ? "white" : "black",
+      padding: 10,
+      "&:hover": {
+        color: "white",
+        backgroundColor: "red",
+      },
+    }),
+  };
+
+  const Segment = () => {
+    return (
+      <Box mt={ 5 }>
+        <Text fontSize={ 12 }>Execute this event... </Text>
+        <Flex gap={ 2 } mt={ 2 }>
+          <Button
+            fontSize={ 13 }
+            textColor="gray.900"
+            border="1px solid"
+            borderColor="gray.300"
+            variant={ executionType === "immediate" ? "solid" : "outline" }
+            onClick={ () => setExecutionType("immediate") }
+          >
+            Immediately
+          </Button>
+          <Button
+            fontSize={ 13 }
+            textColor="gray.900"
+            border="1px solid"
+            borderColor="gray.300"
+            variant={ executionType === "relative" ? "solid" : "outline" }
+            onClick={ () => setExecutionType("relative") }
+          >
+            At a relative time period
+          </Button>
+          <Button
+            fontSize={ 13 }
+            textColor="gray.900"
+            border="1px solid"
+            borderColor="gray.300"
+            variant={ executionType === "specific" ? "solid" : "outline" }
+            onClick={ () => setExecutionType("specific") }
+          >
+            At a specific date/time
+          </Button>
+        </Flex>
+
+        {/* <Flex gap={ 2 } mt={ 4 }>
+            <Input placeholder="Send from" w="50%" />
+            <Text>or between the hours of</Text>
+            <Input placeholder="Start time" w="20%" />
+            <Input placeholder="End time" w="20%" />
+          </Flex>
+
+          <FormControl mt={ 4 }>
+            <FormLabel>Companies *</FormLabel>
+            <Select placeholder="Search options..." />
+          </FormControl>
+
+          <Button mt={ 2 } colorScheme="red">+ New Company</Button> */}
+      </Box >
+    )
+  }
+
+  const CustomFormFieldWithWeekdays = () => {
+    return (
+      <Flex justifyContent="space-between" gap={ 2 } mt={ 5 }>
+        <Flex flex="1">
+          <Text alignSelf="center" p={ 2 } paddingLeft={ 4 } paddingRight={ 4 } bg="gray.200">#</Text>
+          <Input borderRadius="0 8px 8px 0" flex="1" width="60px" />
+        </Flex>
+        <Select flex="2">
+          <option value="days">Day(s)</option>
+          <option value="hours">Hour(s)</option>
+          <option value="minutes">Minute(s)</option>
+        </Select>
+      </Flex>
+    )
+  }
+
+  const CustomFormFieldWithTime = () => {
+    return (
+      <Flex mt={ 2 } gap={ 5 }>
+        <FormControl flex={ 1 } mt={ 4 }>
+          <Text fontSize={ 14 }>Send from</Text>
+          <Input type="time" />
+        </FormControl>
+        <FormControl flex={ 2 } mt={ 4 }>
+          <Text fontSize={ 14 }>or between the hours of </Text>
+          <Input type="time" />
+        </FormControl>
+        <FormControl flex={ 1 } mt={ 4 }>
+          <Text fontSize={ 14 }>and</Text>
+          <Input type="time" />
+        </FormControl>
+      </Flex>
+    )
+  }
+
+  const CustomFormFieldCheckMarkDays = () => {
+    return (
+      <>
+        <FormLabel fontSize={ 14 } mt={ 4 }>Schedule only on selected days:</FormLabel>
+        <Stack direction="row" wrap="wrap">
+          { ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Weekdays"].map(
+            (day) => (
+              <Checkbox key={ day }>{ day }</Checkbox>
+            )
+          ) }
+        </Stack>
+      </>
+    )
+  }
+
   const CustomFormField: React.FC<CustomFormFieldProps> = ({
     label,
     placeholder,
@@ -81,7 +235,7 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
     icon,
   }) => (
     <FormControl mt={ 4 }>
-      <FormLabel color="black">
+      <FormLabel fontSize={ 12 } color="black">
         { label }{ " " }
         <Text as="span" color={ labelColor }>
           { icon }
@@ -108,7 +262,7 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
     showspan,
   }) => (
     <FormControl mt={ 4 }>
-      <FormLabel color="black">
+      <FormLabel fontSize={ 14 } color="black">
         { label }
         { showspan && (
           <Text as="span" color="gray.400">
@@ -231,7 +385,6 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
                   variant="ghost"
                   onClick={ handleClear }
                 />
-
               </Flex>
             </InputRightElement>
           ) }
@@ -241,6 +394,7 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
   };
   return (
     <Flex
+      overflow="auto"
       position="fixed"
       top={ 0 }
       left={ 0 }
@@ -276,15 +430,31 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
           popupType === DecisionsTypes.VISITS_A_PAGE ||
           popupType === ActionsTypes.ADD_DO_NOT_CONTACT ||
           popupType === ActionsTypes.ADD_TO_COMPANY_SCORE ||
-          popupType === ActionsTypes.ADD_TO_COMPANY_ACTION) && (
+          popupType === ActionsTypes.ADD_TO_COMPANY_ACTION ||
+          popupType === ConditionsTypes.CONTACT_CAMPAIGNS ||
+          popupType === ConditionsTypes.CONTACT_DEVICE ||
+          popupType === ConditionsTypes.CONTACT_FIELD_VALUE ||
+          popupType === ConditionsTypes.CONTACT_OWNER ||
+          popupType === ConditionsTypes.CONTACT_POINTS ||
+          popupType === ConditionsTypes.CONTACT_SEGMENTS ||
+          popupType === ConditionsTypes.CONTACT_STAGES ||
+          popupType === ConditionsTypes.CONTACT_TAGS ||
+          popupType === ConditionsTypes.FORM_FIELD_VALUE ||
+          popupType === ConditionsTypes.HAS_ACTIVE_NOTIFICATION ||
+          popupType === ConditionsTypes.HAS_VALID_EMAIL_ADDRESS ||
+          popupType === ConditionsTypes.MARKED_AS_DNC ||
+          popupType === ConditionsTypes.VISITED_PAGE)
+          && (
             <FormControl mt={ 4 }>
-              <FormLabel color="black">Name</FormLabel>
+              <FormLabel fontSize={ 12 } color="black">Name</FormLabel>
               <Input
                 onChange={ (e) => setSelectedName(e.target.value) }
                 placeholder="Enter name"
               />
             </FormControl>
           ) }
+
+        <Segment />
 
         {/* Name Input */ }
         { (popupType === DecisionsTypes.SENDS_A_APP_PUSH_MESSAGE ||
@@ -382,19 +552,7 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
         ) }
 
         {/* Channel Selection */ }
-
-        { popupType === ActionsTypes.ADD_DO_NOT_CONTACT && (
-          <MultiSelectField
-            label="Channels"
-            categoryKey="channel"
-            selectedItems={ selectedItems }
-            handleSelect={ handleSelect }
-            handleRemove={ handleRemove }
-            options={ categories.channel }
-            showspan={ false }
-          />
-        ) }
-        { popupType === ActionsTypes.ADD_DO_NOT_CONTACT && (
+        {/* { popupType === ActionsTypes.ADD_DO_NOT_CONTACT && (
           <ExpandableTextArea
             label="Reason"
             placeholder="Enter your reason here..."
@@ -402,16 +560,287 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
 
             <h1 style={ { color: "#000" } }>Hello</h1>
           </ExpandableTextArea>
+        ) } */}
+
+        { executionType === "relative" && (
+          <>
+            { popupType === ActionsTypes.ADD_DO_NOT_CONTACT && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <MultiSelectField
+                  label="Channels"
+                  categoryKey="channel"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.channel }
+                  showspan={ false }
+                />
+                <FormControl mt={ 4 }>
+                  <FormLabel>Reason</FormLabel>
+                  <Textarea placeholder="Enter reason" />
+                </FormControl>
+              </>
+            ) }
+            { popupType === ActionsTypes.ADD_TO_COMPANY_SCORE && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <CustomFormField
+                  label="Add to company's score"
+                  placeholder=""
+                  labelColor="red"
+                  icon="*"
+                ></CustomFormField>
+              </>
+            ) }
+
+
+            { (popupType === ConditionsTypes.CONTACT_CAMPAIGNS) && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <CustomFormField
+                  label="Campaigns membership"
+                  placeholder=""
+                  labelColor="red"
+                  icon="*"
+                ></CustomFormField>
+
+                <Box mt={ 4 }>
+                  {/* Filter Toggle */ }
+                  <FormControl>
+                    <FormLabel>Filter by date added to campaign</FormLabel>
+                    <HStack>
+                      <Button
+                        colorScheme={ !filterEnabled ? "red" : "gray" }
+                        variant={ !filterEnabled ? "solid" : "outline" }
+                        onClick={ () => setFilterEnabled(false) }
+                      >
+                        No
+                      </Button>
+                      <Button
+                        colorScheme={ filterEnabled ? "green" : "gray" }
+                        variant={ filterEnabled ? "solid" : "outline" }
+                        onClick={ () => setFilterEnabled(true) }
+                      >
+                        Yes
+                      </Button>
+                    </HStack>
+                  </FormControl>
+
+                  {/* Conditional Fields */ }
+                  { filterEnabled && (
+                    <>
+                      {/* Expression Dropdown */ }
+                      <FormControl mt={ 4 }>
+                        <FormLabel>Expression</FormLabel>
+                        <Select placeholder="Choose one...">
+                          <option value="before">greater than</option>
+                          <option value="after">less than</option>
+                        </Select>
+                      </FormControl>
+
+                      {/* Date Input */ }
+                      <FormControl mt={ 4 }>
+                        <FormLabel>Date</FormLabel>
+                        <Input type="datetime-local" />
+                      </FormControl>
+                    </>
+                  ) }
+                </Box>
+              </>
+            ) }
+          </>
         ) }
 
-        { popupType === ActionsTypes.ADD_TO_COMPANY_SCORE && (
-          <CustomFormField
-            label="Add to company's score"
-            placeholder=""
-            labelColor="red"
-            icon="*"
-          ></CustomFormField>
+
+        { executionType === "immediate" &&
+          <>
+            { (popupType === ActionsTypes.ADD_DO_NOT_CONTACT) && (
+              <>
+                <MultiSelectField
+                  label="Channels"
+                  categoryKey="channel"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.channel }
+                  showspan={ false }
+                />
+                <FormControl mt={ 4 }>
+                  <FormLabel>Reason</FormLabel>
+                  <Textarea placeholder="Enter reason" />
+                </FormControl>
+              </>
+            ) }
+
+            { (popupType === ActionsTypes.ADD_TO_COMPANY_SCORE) && (
+              <CustomFormField
+                label="Add to company's score"
+                placeholder=""
+                labelColor="red"
+                icon="*"
+              ></CustomFormField>
+            ) }
+
+            { (popupType === ConditionsTypes.CONTACT_CAMPAIGNS) && (
+              <>
+                <CustomFormField
+                  label="Campaigns membership"
+                  placeholder=""
+                  labelColor="red"
+                  icon="*"
+                ></CustomFormField>
+
+                <Box mt={ 4 }>
+                  {/* Filter Toggle */ }
+                  <FormControl>
+                    <FormLabel>Filter by date added to campaign</FormLabel>
+                    <HStack>
+                      <Button
+                        colorScheme={ !filterEnabled ? "red" : "gray" }
+                        variant={ !filterEnabled ? "solid" : "outline" }
+                        onClick={ () => setFilterEnabled(false) }
+                      >
+                        No
+                      </Button>
+                      <Button
+                        colorScheme={ filterEnabled ? "green" : "gray" }
+                        variant={ filterEnabled ? "solid" : "outline" }
+                        onClick={ () => setFilterEnabled(true) }
+                      >
+                        Yes
+                      </Button>
+                    </HStack>
+                  </FormControl>
+
+                  {/* Conditional Fields */ }
+                  { filterEnabled && (
+                    <>
+                      {/* Expression Dropdown */ }
+                      <FormControl mt={ 4 }>
+                        <FormLabel>Expression</FormLabel>
+                        <Select placeholder="Choose one...">
+                          <option value="before">greater than</option>
+                          <option value="after">less than</option>
+                        </Select>
+                      </FormControl>
+
+                      {/* Date Input */ }
+                      <FormControl mt={ 4 }>
+                        <FormLabel>Date</FormLabel>
+                        <Input type="datetime-local" />
+                      </FormControl>
+                    </>
+                  ) }
+                </Box>
+              </>
+            ) }
+          </>
+        }
+
+        { executionType === "specific" && (
+          <>
+            { popupType === ActionsTypes.ADD_DO_NOT_CONTACT && (
+              <>
+                <FormControl mt={ 4 }>
+                  <Input type="datetime-local" />
+                </FormControl>
+                <MultiSelectField
+                  label="Channels"
+                  categoryKey="channel"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.channel }
+                  showspan={ false }
+                />
+                <FormControl mt={ 4 }>
+                  <FormLabel>Reason</FormLabel>
+                  <Textarea placeholder="Enter reason" />
+                </FormControl>
+              </>
+            ) }
+            { (popupType === ActionsTypes.ADD_TO_COMPANY_SCORE) && (
+              <>
+                <FormControl mt={ 4 }>
+                  <Input type="datetime-local" />
+                </FormControl>
+                <CustomFormField
+                  label="Add to company's score"
+                  placeholder=""
+                  labelColor="red"
+                  icon="*"
+                ></CustomFormField>
+              </>
+            ) }
+            { (popupType === ConditionsTypes.CONTACT_CAMPAIGNS) && (
+              <>
+                {/* Date Input */ }
+                <FormControl mt={ 4 }>
+                  <FormLabel>Date</FormLabel>
+                  <Input type="datetime-local" />
+                </FormControl>
+                <CustomFormField
+                  label="Campaigns membership"
+                  placeholder=""
+                  labelColor="red"
+                  icon="*"
+                ></CustomFormField>
+
+                <Box mt={ 4 }>
+                  {/* Filter Toggle */ }
+                  <FormControl>
+                    <FormLabel>Filter by date added to campaign</FormLabel>
+                    <HStack>
+                      <Button
+                        colorScheme={ !filterEnabled ? "red" : "gray" }
+                        variant={ !filterEnabled ? "solid" : "outline" }
+                        onClick={ () => setFilterEnabled(false) }
+                      >
+                        No
+                      </Button>
+                      <Button
+                        colorScheme={ filterEnabled ? "green" : "gray" }
+                        variant={ filterEnabled ? "solid" : "outline" }
+                        onClick={ () => setFilterEnabled(true) }
+                      >
+                        Yes
+                      </Button>
+                    </HStack>
+                  </FormControl>
+
+                  {/* Conditional Fields */ }
+                  { filterEnabled && (
+                    <>
+                      {/* Expression Dropdown */ }
+                      <FormControl mt={ 4 }>
+                        <FormLabel>Expression</FormLabel>
+                        <Select placeholder="Choose one...">
+                          <option value="before">greater than</option>
+                          <option value="after">less than</option>
+                        </Select>
+                      </FormControl>
+
+                      {/* Date Input */ }
+                      <FormControl mt={ 4 }>
+                        <FormLabel>Date</FormLabel>
+                        <Input type="datetime-local" />
+                      </FormControl>
+                    </>
+                  ) }
+                </Box>
+              </>
+            ) }
+
+          </>
         ) }
+
         { popupType === ActionsTypes.ADD_TO_COMPANY_ACTION && (
           <CustomFormField
             label="Companies"

@@ -1,4 +1,5 @@
-import { ActionsTypes, DecisionsTypes } from "../../../Constants/enums";
+import { ReactNode } from "react";
+import { ActionsTypes, ConditionsTypes, DecisionsTypes } from "../../../Constants/enums";
 
 interface CustomFormFieldProps {
     label: string;
@@ -20,6 +21,7 @@ interface MultiSelectFieldProps {
 interface ExpandableTextAreaProps {
   label: string;
   placeholder?: string;
+  children: ReactNode
 }
 
 interface SingleSelectProps {
@@ -65,6 +67,22 @@ const categories = {
   selectMessage:["Stage 1", "Stage 2", "Stage 3", "Stage 4"],
   selectAMarketingMessage:["Stage 1", "Stage 2", "Stage 3", "Stage 4"],
 };
+
+const contactConditions: string[] = [
+  "Contact campaigns",
+  "Contact device",
+  "Contact field value",
+  "Contact owner",
+  "Contact points",
+  "Contact segments",
+  "Contact stages",
+  "Contact tags",
+  "Form field value",
+  "Has active notification",
+  "Has valid email address",
+  "Marked as DNC",
+  "Visited page"
+];
 
 const getPopUpHeaderText = (popupType: string) => {
   switch (popupType) {
@@ -144,6 +162,32 @@ const getPopUpHeaderText = (popupType: string) => {
       return { title: "Update contact's primary company", description: "Update the contact's primary company fields with the defined values from this action" }
     case ActionsTypes.UPDATE_CONTACT_OWNER:
       return { title: "Update contact owner", description: "This action will update contact owner as part of a campaign" }
+    case ConditionsTypes.CONTACT_CAMPAIGNS:
+      return {title: "Contact campaigns", description: "Condition based on a contact campaigns."}
+    case ConditionsTypes.CONTACT_DEVICE:
+      return {title: "Contact device", description: "Condition based on a contact device."}
+    case ConditionsTypes.CONTACT_FIELD_VALUE:
+      return {title: "Contact field value", description: "Condition based on a contact field value."}
+    case ConditionsTypes.CONTACT_OWNER:
+      return {title: "Contact owner", description: "Condition based on a contact owner."}
+    case ConditionsTypes.CONTACT_POINTS:
+      return {title: "Contact points", description: "Condition based on contact score"}
+    case ConditionsTypes.CONTACT_SEGMENTS:
+      return {title: "Contact segments", description: "Condition based on a contact segments."}
+    case ConditionsTypes.CONTACT_STAGES:
+      return {title: "Contact stages", description: "Condition that the contact belongs to at least one of the selected stages."}
+    case ConditionsTypes.CONTACT_TAGS:
+      return {title: "Contact tags", description: "Condition based on a contact tags."}
+    case ConditionsTypes.FORM_FIELD_VALUE:
+      return {title: "Form field value", description: "Trigger actions when a submitted form field value suits the defined condition."}
+    case ConditionsTypes.HAS_ACTIVE_NOTIFICATION:
+      return {title: "Has active notification", description: "Condition check If contact has active notification."}
+    case ConditionsTypes.HAS_VALID_EMAIL_ADDRESS:
+      return {title: "Has valid email address", description: "Attempt to validate contact's email address. This may not be 100% accurate."}
+    case ConditionsTypes.MARKED_AS_DNC:
+      return {title: "Marked as DNC", description: "Condition checks if the contact has the Do Not Contact flag."}
+    case ConditionsTypes.VISITED_PAGE:
+      return {title: "Visited page", description: "Condition based on all the pages the contact has visited in the past"}
     default:
       return { title: "Device visit", description: "Trigger device on a page/url hit." }
   }
@@ -153,7 +197,8 @@ const getPopUpHeaderText = (popupType: string) => {
 export {
   contactDecisions,
   categories,
-  getPopUpHeaderText
+  getPopUpHeaderText,
+  contactConditions
 };
 export type { 
   CustomFormFieldProps,

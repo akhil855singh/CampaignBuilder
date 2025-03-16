@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { RiCornerRightUpLine } from "react-icons/ri";
 import { contactActions } from "./ActionsModalView/ActionsModaViewModal";
 import { DropdownType } from "./SelectionPopup";
-import { contactDecisions } from "./DecisionsModalView/DecisionsModalViewModal";
+import { contactDecisions, contactConditions } from "./DecisionsModalView/DecisionsModalViewModal";
 
 interface Props {
   parentId: string;
@@ -49,7 +49,7 @@ function DropdownView({
         setFilteredData(data);
         break;
       case DropdownType.CONDITION:
-        data = [];
+        data = contactConditions
         setFilteredData(data);
         break;
       case DropdownType.DECISION:
@@ -201,7 +201,7 @@ function DropdownView({
                         dropdownProps,
                         parentPosition
                       ),
-                      closeDropdown()
+                      closeDropdown
                     ]
                     }
                     onMouseEnter={ () => setHoveredIndex(index) }

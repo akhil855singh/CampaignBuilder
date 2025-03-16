@@ -49,6 +49,22 @@ enum ActionsTypes {
     UPDATE_CONTACT_OWNER = "Update contact owner"
 }
 
+enum ConditionsTypes {
+    CONTACT_CAMPAIGNS = "Contact campaigns",
+    CONTACT_DEVICE = "Contact device",
+    CONTACT_FIELD_VALUE = "Contact field value",
+    CONTACT_OWNER = "Contact owner",
+    CONTACT_POINTS = "Contact points",
+    CONTACT_SEGMENTS = "Contact segments",
+    CONTACT_STAGES = "Contact stages",
+    CONTACT_TAGS = "Contact tags",
+    FORM_FIELD_VALUE = "Form field value",
+    HAS_ACTIVE_NOTIFICATION = "Has active notification",
+    HAS_VALID_EMAIL_ADDRESS = "Has valid email address",
+    MARKED_AS_DNC = "Marked as DNC",
+    VISITED_PAGE = "Visited page",
+}
+
 enum DropdownType {
     DECISION = "Decisions",
     ACTION = "Actions",
@@ -69,4 +85,5 @@ export {
     DropdownType,
     ButtonActions,
     DecisionsTypes,
+    ConditionsTypes
 }
