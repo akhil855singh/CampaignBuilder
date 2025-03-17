@@ -4,7 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { RiCornerRightUpLine } from "react-icons/ri";
 import { contactActions } from "./ActionsModalView/ActionsModaViewModal";
 import { DropdownType } from "./SelectionPopup";
-import { contactDecisions, contactConditions } from "./DecisionsModalView/DecisionsModalViewModal";
+import {
+  contactDecisions,
+  contactConditions,
+} from "./DecisionsModalView/DecisionsModal";
 
 interface Props {
   parentId: string;
@@ -22,8 +25,8 @@ interface Props {
     parentId: string,
     dropdownProps: { dropdownType: DropdownType; dropdownColor: string }
   ) => void;
-  backBtn: () => void
-  closeDropdown: () => void
+  backBtn: () => void;
+  closeDropdown: () => void;
 }
 
 let data: string[] = [];
@@ -34,7 +37,7 @@ function DropdownView({
   parentPosition,
   selectedOption,
   backBtn,
-  closeDropdown
+  closeDropdown,
 }: Props) {
   const [showInputView, setShowInputView] = useState(true);
   const [inputValue, setInputValue] = useState("");
@@ -49,7 +52,7 @@ function DropdownView({
         setFilteredData(data);
         break;
       case DropdownType.CONDITION:
-        data = contactConditions
+        data = contactConditions;
         setFilteredData(data);
         break;
       case DropdownType.DECISION:
@@ -79,17 +82,17 @@ function DropdownView({
 
   return (
     <div
-      onClick={ (e) => handleClickOutside(e) }
-      style={ {
+      onClick={(e) => handleClickOutside(e)}
+      style={{
         position: "relative",
         left: (parentPosition.x - 280) / 2,
         width: 500,
         height: 200,
         zIndex: 5,
-      } }
+      }}
     >
       <div
-        style={ {
+        style={{
           position: "relative",
           top: -10,
           width: 300,
@@ -99,34 +102,34 @@ function DropdownView({
           background: "#ededed",
           padding: "10px 20px",
           marginBottom: "5px",
-        } }
+        }}
       >
         <Flex justifyContent="space-between">
-          <p style={ { fontSize: "16px", marginBottom: "5px", color: "#000" } }>
-            { dropdownProps.dropdownType }
+          <p style={{ fontSize: "16px", marginBottom: "5px", color: "#000" }}>
+            {dropdownProps.dropdownType}
           </p>
           <Button
-            _focus={ { outline: "none", border: "none" } }
-            _hover={ { bg: dropdownProps.dropdownColor, border: "none" } }
+            _focus={{ outline: "none", border: "none" }}
+            _hover={{ bg: dropdownProps.dropdownColor, border: "none" }}
             w="3"
             leftIcon={
               <RiCornerRightUpLine
-                style={ { fontSize: 20, transform: "translate(4px, 0px)" } }
-                onClick={ backBtn }
+                style={{ fontSize: 20, transform: "translate(4px, 0px)" }}
+                onClick={backBtn}
               />
             }
-            bg={ dropdownProps.dropdownColor }
-            h={ 7 }
+            bg={dropdownProps.dropdownColor}
+            h={7}
           ></Button>
         </Flex>
         <div
-          ref={ dropdownRef }
-          onClick={ () =>
+          ref={dropdownRef}
+          onClick={() =>
             showInputView
               ? setShowInputView(false)
               : [setShowInputView(true), setHoveredIndex(0)]
           }
-          style={ {
+          style={{
             width: 260,
             height: 32,
             paddingLeft: 8,
@@ -134,26 +137,26 @@ function DropdownView({
             background: "#fff",
             display: "flex",
             alignItems: "center",
-          } }
+          }}
         >
-          <p style={ { fontSize: "13px", color: "#000" } }>Choose me...</p>
+          <p style={{ fontSize: "13px", color: "#000" }}>Choose me...</p>
           <i className="ri-arrow-drop-down-fill"></i>
         </div>
-        { showInputView && (
+        {showInputView && (
           <div
-            style={ {
+            style={{
               width: 260,
               height: 150,
               overflow: "hidden",
               background: "#fff",
               borderRadius: "0 0 10px 10px",
               boxShadow: "0px 10px 10px rgba(0, 0, 0, 0.4)",
-            } }
+            }}
           >
             <input
               type="text"
-              value={ inputValue }
-              onChange={ (e) => {
+              value={inputValue}
+              onChange={(e) => {
                 setInputValue(e.target.value);
                 if (e.target.value.length != 0) {
                   setFilteredData(
@@ -164,8 +167,8 @@ function DropdownView({
                 } else {
                   setFilteredData(data);
                 }
-              } }
-              style={ {
+              }}
+              style={{
                 background: "#fff",
                 color: "#000",
                 border: "1px solid #000",
@@ -175,50 +178,49 @@ function DropdownView({
                 margin: "5px 25px 0 5px",
                 paddingLeft: "5px",
                 paddingRight: "25px",
-              } }
-              onClick={ (e) => e.stopPropagation() }
+              }}
+              onClick={(e) => e.stopPropagation()}
             />
             <i
               className="ri-search-line"
-              style={ { position: "absolute", right: 30, top: 77 } }
+              style={{ position: "absolute", right: 30, top: 77 }}
             ></i>
-            <div style={ { height: "150px", overflowY: "auto" } }>
-              { filteredData.length > 0 ? (
+            <div style={{ height: "150px", overflowY: "auto" }}>
+              {filteredData.length > 0 ? (
                 filteredData.map((item, index) => (
                   <p
-                    key={ index }
-                    style={ {
+                    key={index}
+                    style={{
                       color: hoveredIndex === index ? "#fff" : "gray",
                       padding: 8,
                       margin: "0 3.5px 0 3.5px",
                       marginTop: 10,
                       background: hoveredIndex === index ? "red" : "",
-                    } }
-                    onClick={ () =>
-                      [selectedOption(
+                    }}
+                    onClick={() => [
+                      selectedOption(
                         item,
                         parentId,
                         dropdownProps,
                         parentPosition
                       ),
-                      closeDropdown
-                    ]
-                    }
-                    onMouseEnter={ () => setHoveredIndex(index) }
-                    onMouseLeave={ () => setHoveredIndex(null) }
-                  // onClick={ () => setOpenModal(true) }
+                      closeDropdown,
+                    ]}
+                    onMouseEnter={() => setHoveredIndex(index)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                    // onClick={ () => setOpenModal(true) }
                   >
-                    { item }
+                    {item}
                   </p>
                 ))
               ) : (
-                <p style={ { padding: "10px", color: "gray" } }>
+                <p style={{ padding: "10px", color: "gray" }}>
                   No results found
                 </p>
-              ) }
+              )}
             </div>
           </div>
-        ) }
+        )}
       </div>
     </div>
   );
