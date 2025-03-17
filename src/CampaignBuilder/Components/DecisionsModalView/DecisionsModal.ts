@@ -6,6 +6,7 @@ interface CustomFormFieldProps {
     placeholder: string;
     labelColor?: string;
     icon?: React.ReactNode;
+    marginBottom?: number 
 }
 
 interface MultiSelectFieldProps {
