@@ -246,6 +246,7 @@ const SelectionPopup = ({
           close={ () => [setShowModal(false), setShowDropdown(false), closeSelectionOptions()] }
           add={ (name: string) => onChangeHandler(name) }
           popupType={ selectedItem }
+          selectionType={selectedType.type}
         />
       ) }
     </div>

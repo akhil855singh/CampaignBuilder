@@ -21,23 +21,21 @@ import {
   InputRightElement,
   IconButton,
   Checkbox,
-  InputLeftElement,
   Stack,
-  RadioGroup,
   HStack,
 } from "@chakra-ui/react";
-import RSelect, { SingleValue } from "react-select";
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import { Radio, XCircle } from "lucide-react";
+import { XCircle } from "lucide-react";
 import { InfoIcon } from "@chakra-ui/icons";
-import { ActionsTypes, ConditionsTypes, DecisionsTypes } from "../../../Constants/enums";
+import { ActionsTypes, ConditionsTypes, DecisionsTypes, DropdownType } from "../../../Constants/enums";
 import { categories, CustomFormFieldProps, ExpandableTextAreaProps, getPopUpHeaderText, MultiSelectFieldProps, SingleSelectProps } from "./DecisionsModalViewModal";
 interface Props {
   // type: string
   // items: string[]
   close: () => void;
-  add: (item: string) => void;
-  popupType: string;
+  add: (item: string) => void
+  popupType: string
+  selectionType: string
 }
 
 const options = [
@@ -48,7 +46,7 @@ const options = [
   { value: "years", label: "year(s)" },
 ];
 
-const DecisionsModalView = ({ close, add, popupType }: Props) => {
+const DecisionsModalView = ({ close, add, popupType, selectionType }: Props) => {
   const { title, description } = getPopUpHeaderText(popupType);
   const [filterEnabled, setFilterEnabled] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
@@ -244,6 +242,25 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
       <Input placeholder={ placeholder || "Enter value" } />
     </FormControl>
   );
+
+  interface CustomFormFieldChooseOneProps {
+    label: string
+    placeholder: string
+    options: string[]
+  }
+
+  const CustomFormFieldChooseOne = ({ label, placeholder, options }: CustomFormFieldChooseOneProps) => {
+    return (
+      <FormControl mt={ 4 }>
+        <FormLabel>{ label }</FormLabel>
+        <Select placeholder={ placeholder }>
+          {
+            options.map(option => <option value={ option }>{ option }</option>)
+          }
+        </Select>
+      </FormControl>
+    )
+  }
 
   const CustomFormFieldWithOutSpan: React.FC<CustomFormFieldProps> = ({ label, placeholder }) => <FormControl mt={ 4 }>
     <FormLabel color="black">
@@ -454,7 +471,9 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
             </FormControl>
           ) }
 
-        <Segment />
+        { (selectionType === DropdownType.ACTION || selectionType === DropdownType.CONDITION) && (
+          <Segment />
+        ) }
 
         {/* Name Input */ }
         { (popupType === DecisionsTypes.SENDS_A_APP_PUSH_MESSAGE ||
@@ -598,7 +617,6 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
               </>
             ) }
 
-
             { (popupType === ConditionsTypes.CONTACT_CAMPAIGNS) && (
               <>
                 <CustomFormFieldWithWeekdays />
@@ -637,13 +655,11 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
                   { filterEnabled && (
                     <>
                       {/* Expression Dropdown */ }
-                      <FormControl mt={ 4 }>
-                        <FormLabel>Expression</FormLabel>
-                        <Select placeholder="Choose one...">
-                          <option value="before">greater than</option>
-                          <option value="after">less than</option>
-                        </Select>
-                      </FormControl>
+                      <CustomFormFieldChooseOne
+                        label="Expression"
+                        placeholder="Choose one..."
+                        options={ ["greater than", "less than"] }
+                      />
 
                       {/* Date Input */ }
                       <FormControl mt={ 4 }>
@@ -719,17 +735,13 @@ const DecisionsModalView = ({ close, add, popupType }: Props) => {
                     </HStack>
                   </FormControl>
 
-                  {/* Conditional Fields */ }
                   { filterEnabled && (
                     <>
-                      {/* Expression Dropdown */ }
-                      <FormControl mt={ 4 }>
-                        <FormLabel>Expression</FormLabel>
-                        <Select placeholder="Choose one...">
-                          <option value="before">greater than</option>
-                          <option value="after">less than</option>
-                        </Select>
-                      </FormControl>
+                      <CustomFormFieldChooseOne
+                        label="Expression"
+                        placeholder="Choose one..."
+                        options={ ["greater than", "less than"] }
+                      />
 
                       {/* Date Input */ }
                       <FormControl mt={ 4 }>
