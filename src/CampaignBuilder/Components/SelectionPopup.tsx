@@ -18,15 +18,15 @@ import { nanoid } from "nanoid";
 import { DecisionsModalView } from "./DecisionsModalView/DecisionsModalView";
 
 interface Props {
-  isFirstNode: boolean
-  nodeCopy: {}
-  parentNodeId: string
-  type: DropdownType.ACTION | DropdownType.CONDITION | DropdownType.DECISION
+  isFirstNode: boolean;
+  nodeCopy: {};
+  parentNodeId: string;
+  type: DropdownType.ACTION | DropdownType.CONDITION | DropdownType.DECISION;
   parentPosition: {
     x: number;
     y: number;
-  }
-  closeSelectionOptions: () => void
+  };
+  closeSelectionOptions: () => void;
 }
 
 const SelectionPopup = ({
@@ -35,7 +35,7 @@ const SelectionPopup = ({
   type,
   parentNodeId = "",
   parentPosition,
-  closeSelectionOptions
+  closeSelectionOptions,
 }: Props) => {
   const rootRef = useRef(null);
   const [selectedType, setSelectedType] = useState({
@@ -48,8 +48,9 @@ const SelectionPopup = ({
 
   const [selectedItem, setSelectedItem] = useState("");
   const { setNodes, setEdges } = useReactFlow();
-  const [showDropdown, setShowDropdown] = useState(false)
-  const [showModal, setShowModal] = useState(false)
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
   const [blocks, setBlocks] = useState([
     {
       buttonText: "Select",
@@ -108,10 +109,10 @@ const SelectionPopup = ({
     setSelectedItem(item);
     // closeSelectionOptions()
     setShowModal(true);
-  };
+  }
 
   function insertCopiedNode() {
-    setNodes((prevNodes) => prevNodes.splice(1, 0, nodeCopy))
+    setNodes((prevNodes) => prevNodes.splice(1, 0, nodeCopy));
   }
 
   const onChangeHandler = (name: string) => {
@@ -124,8 +125,8 @@ const SelectionPopup = ({
         type: "text",
         connectable: true,
         position: {
-          x: parentPosition.x,
-          y: parentPosition.y,
+          x: parentPosition.x - parentPosition.x / 2,
+          y: parentPosition.y - parentPosition.y / 2,
         },
         data: {
           label: name,
@@ -152,81 +153,83 @@ const SelectionPopup = ({
 
   return (
     <div
-      style={ {
+      style={{
         //top: "calc(100% + 20px)",
         top: parentPosition.y + 5,
         left: parentPosition.x / 2,
         position: "relative",
-        zIndex: 1000
-      } }
+        zIndex: 1000,
+      }}
     >
-      { showDropdown ? (
+      {showDropdown ? (
         <DropdownView
-          position={ [parentPosition.y + 20, parentPosition.x] }
-          parentId={ parentNodeId }
-          dropdownProps={ {
+          position={[parentPosition.y + 20, parentPosition.x]}
+          parentId={parentNodeId}
+          dropdownProps={{
             dropdownType: selectedType.type,
             dropdownColor: selectedType.color,
-          } }
-          parentPosition={ parentPosition }
-          selectedOption={ (item: string) => [openSelectionHandlePopup(item) ]}
-          backBtn={ () => setShowDropdown(false) }
+          }}
+          parentPosition={parentPosition}
+          selectedOption={(item: string) => [openSelectionHandlePopup(item)]}
+          backBtn={() => setShowDropdown(false)}
         />
       ) : (
         <>
           <SimpleGrid
-            ref={ rootRef }
-            spacing={ 4 }
+            ref={rootRef}
+            spacing={4}
             justifyContent="center"
             display="flex"
             templateColumns="repeat(3, minmax(200px, 1fr))"
-            maxW={ 250 * 3 }
-            padding={ 5 }
+            maxW={250 * 3}
+            padding={5}
           >
-            { blocks.map((block, index) => (
+            {blocks.map((block, index) => (
               <Card
-                key={ index }
+                key={index}
                 maxW="sm"
                 borderWidth="1px"
                 borderRadius="lg"
-                borderColor={ block.color }
-                style={ { cursor: "pointer", width: "250px" } }
+                borderColor={block.color}
+                style={{ cursor: "pointer", width: "250px" }}
               >
-                <CardHeader style={ { background: block.color, color: "white" } }>
+                <CardHeader style={{ background: block.color, color: "white" }}>
                   <Heading as="h3" size="md">
-                    { block.title }
+                    {block.title}
                   </Heading>
                 </CardHeader>
                 <CardBody>
-                  <Text>{ block.description }</Text>
+                  <Text>{block.description}</Text>
                 </CardBody>
                 <CardFooter>
                   <Button
-                    onClick={ () => [[setSelectedType(block), setShowDropdown(true)]] }
+                    onClick={() => [
+                      [setSelectedType(block), setShowDropdown(true)],
+                    ]}
                     colorScheme="blue"
                   >
-                    { block.buttonText }
+                    {block.buttonText}
                   </Button>
                 </CardFooter>
               </Card>
-            )) }
+            ))}
           </SimpleGrid>
 
-          { isFirstNode && Object.keys(nodeCopy).length > 0 && (
+          {isFirstNode && Object.keys(nodeCopy).length > 0 && (
             <Box
               border="1px solid"
               borderColor="gray.200"
               borderRadius="md"
               boxShadow="sm"
-              p={ 4 }
+              p={4}
               position="relative"
-              w={ 248 * 3 }
+              w={248 * 3}
             >
               <Box
                 h="3px"
                 bgGradient="linear(to-r, teal.300, blue.500, orange.400)"
                 borderTopRadius="md"
-                mb={ 4 }
+                mb={4}
               />
 
               <Flex justify="space-between" align="center">
@@ -235,20 +238,32 @@ const SelectionPopup = ({
                   <Text color="gray.500">Name: lkjhk</Text>
                   <Text color="gray.500">From: New campaign</Text>
                 </Box>
-                <Button onClick={ () => insertCopiedNode() } textColor="gray.900" size="sm" bg={ "rgb(231, 231, 231)" } variant="outline">Insert</Button>
+                <Button
+                  onClick={() => insertCopiedNode()}
+                  textColor="gray.900"
+                  size="sm"
+                  bg={"rgb(231, 231, 231)"}
+                  variant="outline"
+                >
+                  Insert
+                </Button>
               </Flex>
             </Box>
-          ) }
+          )}
         </>
-      ) }
-      { showModal && (
+      )}
+      {showModal && (
         <DecisionsModalView
-          close={ () => [setShowModal(false), setShowDropdown(false), closeSelectionOptions()] }
-          add={ (name: string) => onChangeHandler(name) }
-          popupType={ selectedItem }
+          close={() => [
+            setShowModal(false),
+            setShowDropdown(false),
+            closeSelectionOptions(),
+          ]}
+          add={(name: string) => onChangeHandler(name)}
+          popupType={selectedItem}
           selectionType={selectedType.type}
         />
-      ) }
+      )}
     </div>
   );
 };
