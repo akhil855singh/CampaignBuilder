@@ -146,7 +146,7 @@ function DropdownView({
           <div
             style={{
               width: 260,
-              height: 150,
+              height: 200,
               overflow: "hidden",
               background: "#fff",
               borderRadius: "0 0 10px 10px",

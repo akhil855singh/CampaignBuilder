@@ -25,7 +25,7 @@ import {
   HStack,
   InputRightAddon,
 } from "@chakra-ui/react";
-import { ChevronDownIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, CloseIcon } from "@chakra-ui/icons";
 import { XCircle } from "lucide-react";
 import { InfoIcon, AddIcon, EditIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import {
@@ -36,6 +36,7 @@ import {
 } from "../../../Constants/enums";
 import {
   categories,
+  actionsCategories,
   CustomFormFieldProps,
   ExpandableTextAreaProps,
   getPopUpHeaderText,
@@ -67,7 +68,7 @@ const DecisionsModalView = ({
   selectionType,
 }: Props) => {
   const { title, description } = getPopUpHeaderText(popupType);
-  const [filterEnabled, setFilterEnabled] = useState(false);
+  const [filterEnabled, setFilterEnabled] = useState<Boolean | null>(false);
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({
     deviceTypes: [],
     deviceBrands: [],
@@ -86,15 +87,9 @@ const DecisionsModalView = ({
     removeTags: [],
   });
 
-  // Generic function to handle selection
-  const handleSelect = (category: string, value: string) => {
-    setSelectedItems((prev) => ({
-      ...prev,
-      [category]: prev[category].includes(value)
-        ? prev[category]
-        : [...prev[category], value],
-    }));
-  };
+  const [actionsSelectedItems, setActionsSelectedItems] = useState<Record<string, string[]>>({
+    emailTypes: []
+  })
 
   const [selectedName, setSelectedName] = useState("");
   const [executionType, setExecutionType] = useState("relative");
@@ -110,9 +105,35 @@ const DecisionsModalView = ({
     setSelectedOption(selected); // Ensure it correctly handles null values
   };
 
+  // Generic function to handle selection
+  const handleSelect = (category: string, value: string) => {
+    setSelectedItems((prev) => ({
+      ...prev,
+      [category]: prev[category].includes(value)
+        ? prev[category]
+        : [...prev[category], value],
+    }));
+  };
+
+  const handleActionSelect = (category: string, value: string) => {
+    setActionsSelectedItems((prev) => ({
+      ...prev,
+      [category]: prev[category].includes(value)
+        ? prev[category]
+        : [...prev[category], value],
+    }));
+  };
+
   // Generic function to remove selection
   const handleRemove = (category: string, value: string) => {
     setSelectedItems((prev) => ({
+      ...prev,
+      [category]: prev[category].filter((item) => item !== value),
+    }));
+  };
+
+  const handleActionRemove = (category: string, value: string) => {
+    setActionsSelectedItems((prev) => ({
       ...prev,
       [category]: prev[category].filter((item) => item !== value),
     }));
@@ -345,6 +366,89 @@ const DecisionsModalView = ({
     )
   }
 
+  const CustomFormFieldEmailToUser = () => {
+    return (
+      <HStack gap={ 10 } alignItems="flex-start">
+        <MultiSelectField
+          label="Send email to user"
+          categoryKey="emailTypes"
+          selectedItems={ actionsSelectedItems }
+          handleSelect={ handleActionSelect }
+          handleRemove={ handleActionRemove }
+          options={ actionsCategories.sendEmailToUser }
+          showspan={ true }
+        />
+        <Box mt={ 4 }>
+          <CustomFieldSwitchButton label="Send email to contact's owner" />
+        </Box>
+      </HStack>
+    )
+  }
+
+  interface CustomFieldYesNoButtonProps {
+    label: string
+  }
+
+  const CustomFieldSwitchButton = ({ label }: CustomFieldYesNoButtonProps) => {
+    return (
+      <FormControl>
+        <FormLabel fontSize={ 14 }>{ label }</FormLabel>
+        <HStack>
+          <Button
+            colorScheme={ !filterEnabled ? "red" : "gray" }
+            variant={ !filterEnabled ? "solid" : "outline" }
+            onClick={ () => setFilterEnabled(false) }
+          >
+            No
+          </Button>
+          <Button
+            colorScheme={ filterEnabled ? "green" : "gray" }
+            variant={ filterEnabled ? "solid" : "outline" }
+            onClick={ () => setFilterEnabled(true) }
+          >
+            Yes
+          </Button>
+        </HStack>
+      </FormControl>
+    )
+  }
+
+  const CustomFieldSwitchButtonWithClear = ({ label }: CustomFieldYesNoButtonProps) => {
+    return (
+      <FormControl mt={ 4 }>
+        <FormLabel fontSize={ 14 }>{ label }</FormLabel>
+        <HStack>
+          <Button
+            bg={ filterEnabled === null ? "gray.100" : "white" }
+            borderRadius={ 0 }
+            onClick={ () => setFilterEnabled(null) }
+          >
+            <CloseIcon />
+          </Button>
+          <Button
+            ml={ -2 }
+            colorScheme={ filterEnabled === false ? "red" : "gray" }
+            variant="solid"
+            onClick={ () => setFilterEnabled(false) }
+            borderRadius={ 0 }
+          >
+            No
+          </Button>
+          <Button
+            ml={ -2 }
+            colorScheme={ filterEnabled === true ? "green" : "gray" }
+            variant="solid"
+            onClick={ () => setFilterEnabled(true) }
+            borderRadius={ 0 }
+            _hover={ { outline: "none", border: "1px #ddd" } }
+          >
+            Yes
+          </Button>
+        </HStack>
+      </FormControl>
+    )
+  }
+
   const CustomFormFieldCheckMarkDays = () => {
     return (
       <>
@@ -406,7 +510,7 @@ const DecisionsModalView = ({
     options,
     showspan,
   }) => (
-    <FormControl mt={ 4 }>
+    <FormControl maxW="250" mt={ 4 }>
       <FormLabel fontSize={ 14 } color="black">
         { label }
         { showspan && (
@@ -425,6 +529,10 @@ const DecisionsModalView = ({
           justifyContent="space-between"
           border="1px solid"
           borderColor="gray.800"
+          minH="10"
+          h="auto"
+          whiteSpace="normal"
+          wordBreak="break-word"
         >
           { selectedItems[categoryKey]?.length > 0
             ? selectedItems[categoryKey].join(", ")
@@ -596,6 +704,18 @@ const DecisionsModalView = ({
           popupType === ActionsTypes.REMOVE_DO_NOT_CONTACT ||
           popupType === ActionsTypes.SEND_APP_PUSH_MESSAGE ||
           popupType === ActionsTypes.SEND_WEBHOOK ||
+          popupType === ActionsTypes.SEND_EMAIL ||
+          popupType === ActionsTypes.SEND_EMAIL_TO_USER ||
+          popupType === ActionsTypes.SEND_MARKETING_MESSAGE ||
+          popupType === ActionsTypes.SEND_RCSBOT_MESSAGE ||
+          popupType === ActionsTypes.SEND_RCS_MESSAGE ||
+          popupType === ActionsTypes.SEND_TEXT_MESSAGE ||
+          popupType === ActionsTypes.SEND_WEBPUSH_MESSAGE ||
+          popupType === ActionsTypes.SEND_WHATSAPPBOT_MESSAGE ||
+          popupType === ActionsTypes.SEND_WHATSAPP_MESSAGE ||
+          popupType === ActionsTypes.UPDATE_CONTACT ||
+          popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY ||
+          popupType === ActionsTypes.UPDATE_CONTACT_OWNER ||
           popupType === ConditionsTypes.CONTACT_CAMPAIGNS ||
           popupType === ConditionsTypes.CONTACT_DEVICE ||
           popupType === ConditionsTypes.CONTACT_FIELD_VALUE ||
@@ -779,25 +899,7 @@ const DecisionsModalView = ({
 
                 <Box mt={ 4 }>
                   {/* Filter Toggle */ }
-                  <FormControl>
-                    <FormLabel>Filter by date added to campaign</FormLabel>
-                    <HStack>
-                      <Button
-                        colorScheme={ !filterEnabled ? "red" : "gray" }
-                        variant={ !filterEnabled ? "solid" : "outline" }
-                        onClick={ () => setFilterEnabled(false) }
-                      >
-                        No
-                      </Button>
-                      <Button
-                        colorScheme={ filterEnabled ? "green" : "gray" }
-                        variant={ filterEnabled ? "solid" : "outline" }
-                        onClick={ () => setFilterEnabled(true) }
-                      >
-                        Yes
-                      </Button>
-                    </HStack>
-                  </FormControl>
+                  <CustomFieldSwitchButton label="Filter by date added to campaign<" />
 
                   {/* Conditional Fields */ }
                   { filterEnabled && (
@@ -1077,6 +1179,548 @@ const DecisionsModalView = ({
                 <EmailButtons />
               </>
             ) }
+
+            { (popupType === ActionsTypes.SEND_EMAIL_TO_USER) && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <CustomFormFieldEmailToUser />
+                <CustomFormField
+                  label="To"
+                  placeholder="Optional"
+                />
+                <CustomFormField
+                  label="CC"
+                  placeholder="Optional"
+                />
+                <CustomFormField
+                  label="BCC"
+                  placeholder="Optional"
+                />
+                <SingleSelect
+                  label="Email to send"
+                  options={ ["2W-Insurace Reminder-Pre-Expire-Airtel Payment Bank"] }
+                />
+                <EmailButtons />
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_MARKETING_MESSAGE && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <SingleSelect
+                  label="Select a marketing message"
+                  options={ categories.selectAMarketingMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_RCSBOT_MESSAGE && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + New RcsBot Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + Edit RcsBot Message
+                </Button>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_RCS_MESSAGE && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + New Rcs Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + Edit Rcs Message
+                </Button>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_TEXT_MESSAGE && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + New Text Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + Edit Text Message
+                </Button>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_WEBPUSH_MESSAGE && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + New Webpush Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + Edit Webpush Message
+                </Button>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_WHATSAPPBOT_MESSAGE && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <AddIcon /> }
+                >
+                  New WhatsappBot Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <EditIcon /> }
+                >
+                  Edit WhatsappBot Message
+                </Button>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_WHATSAPP_MESSAGE && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <AddIcon /> }
+                >
+                  New Whatsapp Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <EditIcon /> }
+                >
+                  Edit Whatsapp Message
+                </Button>
+              </>
+            ) }
+
+            { (popupType === ActionsTypes.UPDATE_CONTACT) && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <CustomFormFieldWithOutSpan
+                  label="vernac language"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFieldSwitchButtonWithClear
+                  label="Vernacular_enabled"
+                />
+                <CustomFormFieldWithOutSpan
+                  label="Account Type"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="TriggerInstantCommunication"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFieldSwitchButtonWithClear
+                  label="bill_paymnet_done"
+                />
+                <CustomFormFieldWithOutSpan
+                  label="Due Date"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Account Balance amount"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Account Status"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Dormant/Inactive Since"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Date of birth"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Onboarding Date"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Expiry_date"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="DOB"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="webpush_activated"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Gender"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="apppush_activated"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Middle Name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Hobbies"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Title"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="First Name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Last Name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Primary company"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="father name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Position"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Customer ID"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Email"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Mobile"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Phone"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Points"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Points"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Fax"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Mother Name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Address Line 1"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Address Line 2"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="City"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="State"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Zip Code"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Country"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Preferred Locale"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Preferred Timezone"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Date Last Active"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Attribution Date"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Attribution"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Website"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Facebook"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Foursquare"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Instagram"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="LinkedIn"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Skype"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Twitter"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+              </>
+            ) }
+
+            { (popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY) && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <CustomFormFieldWithOutSpan
+                  label="Address 1"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Address 2"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Company Email"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Phone"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="City"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="State"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Zip Code"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Country"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Company Name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Website"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Number of Employees"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Fax"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Annual Revenue"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Industry"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Description"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.UPDATE_CONTACT_OWNER && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <SingleSelect
+                  label="Add to the following:"
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+              </>
+            ) }
           </>
         ) }
 
@@ -1120,25 +1764,7 @@ const DecisionsModalView = ({
 
                 <Box mt={ 4 }>
                   {/* Filter Toggle */ }
-                  <FormControl>
-                    <FormLabel>Filter by date added to campaign</FormLabel>
-                    <HStack>
-                      <Button
-                        colorScheme={ !filterEnabled ? "red" : "gray" }
-                        variant={ !filterEnabled ? "solid" : "outline" }
-                        onClick={ () => setFilterEnabled(false) }
-                      >
-                        No
-                      </Button>
-                      <Button
-                        colorScheme={ filterEnabled ? "green" : "gray" }
-                        variant={ filterEnabled ? "solid" : "outline" }
-                        onClick={ () => setFilterEnabled(true) }
-                      >
-                        Yes
-                      </Button>
-                    </HStack>
-                  </FormControl>
+                  <CustomFieldSwitchButton label="Filter by date added to campaign<" />
 
                   { filterEnabled && (
                     <>
@@ -1365,6 +1991,513 @@ const DecisionsModalView = ({
                 <EmailButtons />
               </>
             ) }
+
+            { (popupType === ActionsTypes.SEND_EMAIL_TO_USER) && (
+              <>
+                <CustomFormFieldEmailToUser />
+                <CustomFormField
+                  label="To"
+                  placeholder="Optional"
+                />
+                <CustomFormField
+                  label="CC"
+                  placeholder="Optional"
+                />
+                <CustomFormField
+                  label="BCC"
+                  placeholder="Optional"
+                />
+                <SingleSelect
+                  label="Email to send"
+                  options={ ["2W-Insurace Reminder-Pre-Expire-Airtel Payment Bank"] }
+                />
+                <EmailButtons />
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_MARKETING_MESSAGE && (
+              <SingleSelect
+                label="Select a marketing message"
+                options={ categories.selectAMarketingMessage }
+                placeholder="Search Option..."
+                onChange={ (value) => console.log("Selected:", value) }
+              />
+            ) }
+
+            { popupType === ActionsTypes.SEND_RCSBOT_MESSAGE && (
+              <>
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + New RcsBot Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + Edit RcsBot Message
+                </Button>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_RCS_MESSAGE && (
+              <>
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + New Rcs Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + Edit Rcs Message
+                </Button>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_TEXT_MESSAGE && (
+              <>
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + New Text Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + Edit Text Message
+                </Button>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_WEBPUSH_MESSAGE && (
+              <>
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <AddIcon /> }
+                >
+                  New Webpush Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <EditIcon /> }
+                >
+                  Edit Webpush Message
+                </Button>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_WHATSAPPBOT_MESSAGE && (
+              <>
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <AddIcon /> }
+                >
+                  New WhatsappBot Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <EditIcon /> }
+                >
+                  Edit WhatsappBot Message
+                </Button>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_WHATSAPP_MESSAGE && (
+              <>
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <AddIcon /> }
+                >
+                  New Whatsapp Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <EditIcon /> }
+                >
+                  Edit Whatsapp Message
+                </Button>
+              </>
+            ) }
+
+            { (popupType === ActionsTypes.UPDATE_CONTACT) && (
+              <>
+                <CustomFormFieldWithOutSpan
+                  label="vernac language"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFieldSwitchButtonWithClear
+                  label="Vernacular_enabled"
+                />
+                <CustomFormFieldWithOutSpan
+                  label="Account Type"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="TriggerInstantCommunication"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFieldSwitchButtonWithClear
+                  label="bill_paymnet_done"
+                />
+                <CustomFormFieldWithOutSpan
+                  label="Due Date"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Account Balance amount"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Account Status"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Dormant/Inactive Since"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Date of birth"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Onboarding Date"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Expiry_date"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="DOB"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="webpush_activated"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Gender"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="apppush_activated"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Middle Name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Hobbies"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Title"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="First Name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Last Name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Primary company"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="father name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Position"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Customer ID"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Email"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Mobile"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Phone"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Points"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Points"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Fax"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Mother Name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Address Line 1"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Address Line 2"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="City"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="State"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Zip Code"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Country"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Preferred Locale"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Preferred Timezone"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Date Last Active"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Attribution Date"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Attribution"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Website"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Facebook"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Foursquare"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Instagram"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="LinkedIn"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Skype"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Twitter"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+              </>
+            ) }
+
+            { (popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY) && (
+              <>
+                <CustomFormFieldWithOutSpan
+                  label="Address 1"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Address 2"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Company Email"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Phone"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="City"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="State"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Zip Code"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Country"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Company Name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Website"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Number of Employees"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Fax"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Annual Revenue"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Industry"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Description"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.UPDATE_CONTACT_OWNER && (
+              <SingleSelect
+                label="Add to the following:"
+                options={ categories.selectMessage }
+                placeholder="Search Option..."
+                onChange={ (value) => console.log("Selected:", value) }
+              />
+            ) }
           </>
         ) }
 
@@ -1419,25 +2552,7 @@ const DecisionsModalView = ({
 
                 <Box mt={ 4 }>
                   {/* Filter Toggle */ }
-                  <FormControl>
-                    <FormLabel>Filter by date added to campaign</FormLabel>
-                    <HStack>
-                      <Button
-                        colorScheme={ !filterEnabled ? "red" : "gray" }
-                        variant={ !filterEnabled ? "solid" : "outline" }
-                        onClick={ () => setFilterEnabled(false) }
-                      >
-                        No
-                      </Button>
-                      <Button
-                        colorScheme={ filterEnabled ? "green" : "gray" }
-                        variant={ filterEnabled ? "solid" : "outline" }
-                        onClick={ () => setFilterEnabled(true) }
-                      >
-                        Yes
-                      </Button>
-                    </HStack>
-                  </FormControl>
+                  <CustomFieldSwitchButton label="Filter by date added to campaign" />
 
                   {/* Conditional Fields */ }
                   { filterEnabled && (
@@ -1728,472 +2843,562 @@ const DecisionsModalView = ({
                 <EmailButtons />
               </>
             ) }
+
+            { (popupType === ActionsTypes.SEND_EMAIL_TO_USER) && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <CustomFormFieldEmailToUser />
+                <CustomFormField
+                  label="To"
+                  placeholder="Optional"
+                />
+                <CustomFormField
+                  label="CC"
+                  placeholder="Optional"
+                />
+                <CustomFormField
+                  label="BCC"
+                  placeholder="Optional"
+                />
+                <SingleSelect
+                  label="Email to send"
+                  options={ ["2W-Insurace Reminder-Pre-Expire-Airtel Payment Bank"] }
+                />
+                <EmailButtons />
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_MARKETING_MESSAGE && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <SingleSelect
+                  label="Select a marketing message"
+                  options={ categories.selectAMarketingMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_RCSBOT_MESSAGE && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + New RcsBot Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + Edit RcsBot Message
+                </Button>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_RCS_MESSAGE && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + New Rcs Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + Edit Rcs Message
+                </Button>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_TEXT_MESSAGE && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + New Text Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                >
+                  + Edit Text Message
+                </Button>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_WEBPUSH_MESSAGE && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <AddIcon /> }
+                >
+                  New Webpush Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <EditIcon /> }
+                >
+                  Edit Webpush Message
+                </Button>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_WHATSAPPBOT_MESSAGE && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <AddIcon /> }
+                >
+                  New WhatsappBot Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <EditIcon /> }
+                >
+                  Edit WhatsappBot Message
+                </Button>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.SEND_WHATSAPP_MESSAGE && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <SingleSelect
+                  label="Select Message "
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <Button
+                  mt={ 4 }
+                  fontSize={ 14 }
+                  colorScheme="red"
+                  variant="solid"
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <AddIcon /> }
+                >
+                  New Whatsapp Message
+                </Button>
+                <Button
+                  mt={ 4 }
+                  ml={ 1 }
+                  fontSize={ 14 }
+                  textColor="white"
+                  colorScheme="red"
+                  variant="solid"
+                  disabled={ true }
+                  onClick={ () => setFilterEnabled(false) }
+                  leftIcon={ <EditIcon /> }
+                >
+                  Edit Whatsapp Message
+                </Button>
+              </>
+            ) }
+
+            { (popupType === ActionsTypes.UPDATE_CONTACT) && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <CustomFormFieldWithOutSpan
+                  label="vernac language"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFieldSwitchButtonWithClear
+                  label="Vernacular_enabled"
+                />
+                <CustomFormFieldWithOutSpan
+                  label="Account Type"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="TriggerInstantCommunication"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFieldSwitchButtonWithClear
+                  label="bill_paymnet_done"
+                />
+                <CustomFormFieldWithOutSpan
+                  label="Due Date"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Account Balance amount"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Account Status"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Dormant/Inactive Since"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Date of birth"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Onboarding Date"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Expiry_date"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="DOB"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="webpush_activated"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Gender"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="apppush_activated"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Middle Name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Hobbies"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Title"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="First Name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Last Name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Primary company"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="father name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Position"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Customer ID"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Email"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Mobile"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Phone"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Points"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Points"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Fax"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Mother Name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Address Line 1"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Address Line 2"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="City"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="State"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Zip Code"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Country"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Preferred Locale"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Preferred Timezone"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Date Last Active"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Attribution Date"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Attribution"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Website"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Facebook"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Foursquare"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Instagram"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="LinkedIn"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Skype"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Twitter"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+              </>
+            ) }
+
+            { (popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY) && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <CustomFormFieldWithOutSpan
+                  label="Address 1"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Address 2"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Company Email"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Phone"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="City"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="State"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Zip Code"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Country"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Company Name"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Website"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Number of Employees"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Fax"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Annual Revenue"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Industry"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+                <CustomFormFieldWithOutSpan
+                  label="Description"
+                  placeholder=""
+                ></CustomFormFieldWithOutSpan>
+              </>
+            ) }
+
+            { popupType === ActionsTypes.UPDATE_CONTACT_OWNER && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <SingleSelect
+                  label="Add to the following:"
+                  options={ categories.selectMessage }
+                  placeholder="Search Option..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+              </>
+            ) }
           </>
-        ) }
-
-        { popupType === ActionsTypes.UPDATE_CONTACT_OWNER && (
-          <SingleSelect
-            label="Add to the following:"
-            options={ categories.selectMessage }
-            placeholder="Search Option..."
-            onChange={ (value) => console.log("Selected:", value) }
-          />
-        ) }
-
-        { popupType === ActionsTypes.SEND_MARKETING_MESSAGE && (
-          <SingleSelect
-            label="Select a marketing message"
-            options={ categories.selectAMarketingMessage }
-            placeholder="Search Option..."
-            onChange={ (value) => console.log("Selected:", value) }
-          />
-        ) }
-        { popupType === ActionsTypes.SEND_RCSBOT_MESSAGE && (
-          <SingleSelect
-            label="Select Message "
-            options={ categories.selectMessage }
-            placeholder="Search Option..."
-            onChange={ (value) => console.log("Selected:", value) }
-          />
-        ) }
-        { popupType === ActionsTypes.SEND_RCS_MESSAGE && (
-          <SingleSelect
-            label="Select Message "
-            options={ categories.selectMessage }
-            placeholder="Search Option..."
-            onChange={ (value) => console.log("Selected:", value) }
-          />
-        ) }
-        { popupType === ActionsTypes.SEND_TEXT_MESSAGE && (
-          <SingleSelect
-            label="Select Message "
-            options={ categories.selectMessage }
-            placeholder="Search Option..."
-            onChange={ (value) => console.log("Selected:", value) }
-          />
-        ) }
-        { popupType === ActionsTypes.SEND_TEXT_MESSAGE && (
-          <SingleSelect
-            label="Select Message "
-            options={ categories.selectMessage }
-            placeholder="Search Option..."
-            onChange={ (value) => console.log("Selected:", value) }
-          />
-        ) }
-        { popupType === ActionsTypes.SEND_WEBPUSH_MESSAGE && (
-          <SingleSelect
-            label="Select Message "
-            options={ categories.selectMessage }
-            placeholder="Search Option..."
-            onChange={ (value) => console.log("Selected:", value) }
-          />
-        ) }
-        { popupType === ActionsTypes.SEND_WHATSAPPBOT_MESSAGE && (
-          <SingleSelect
-            label="Select Message "
-            options={ categories.selectMessage }
-            placeholder="Search Option..."
-            onChange={ (value) => console.log("Selected:", value) }
-          />
-        ) }
-        { popupType === ActionsTypes.SEND_WHATSAPP_MESSAGE && (
-          <SingleSelect
-            label="Select Message "
-            options={ categories.selectMessage }
-            placeholder="Search Option..."
-            onChange={ (value) => console.log("Selected:", value) }
-          />
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="vernac language"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Account Type"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="TriggerInstantCommunication"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Due Date"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Account Balance amount"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Account Status"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Dormant/Inactive Since"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Date of birth"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Onboarding Date"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Expiry_date"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="DOB"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="webpush_activated"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Gender"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="apppush_activated"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Middle Name"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Hobbies"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Title"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="First Name"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Last Name"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Primary company"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="father name"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Position"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Customer ID"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Email"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Mobile"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Phone"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Points"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Points"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Fax"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Mother Name"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Address Line 1"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Address Line 2"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="City"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="State"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Zip Code"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Country"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Preferred Locale"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Preferred Timezone"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Date Last Active"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Attribution Date"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Attribution"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Website"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Facebook"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Foursquare"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Instagram"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="LinkedIn"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Skype"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT && (
-          <CustomFormFieldWithOutSpan
-            label="Twitter"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-
-        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY && (
-          <CustomFormFieldWithOutSpan
-            label="Address 1"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-
-        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY && (
-          <CustomFormFieldWithOutSpan
-            label="Address 2"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY && (
-          <CustomFormFieldWithOutSpan
-            label="Company Email"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY && (
-          <CustomFormFieldWithOutSpan
-            label="Phone"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-
-        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY && (
-          <CustomFormFieldWithOutSpan
-            label="City"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-
-        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY && (
-          <CustomFormFieldWithOutSpan
-            label="State"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-
-        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY && (
-          <CustomFormFieldWithOutSpan
-            label="Zip Code"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-
-        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY && (
-          <CustomFormFieldWithOutSpan
-            label="Country"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-
-        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY && (
-          <CustomFormFieldWithOutSpan
-            label="Company Name"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY && (
-          <CustomFormFieldWithOutSpan
-            label="Website"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-
-        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY && (
-          <CustomFormFieldWithOutSpan
-            label="Number of Employees"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY && (
-          <CustomFormFieldWithOutSpan
-            label="Fax"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY && (
-          <CustomFormFieldWithOutSpan
-            label="Annual Revenue"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-
-        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY && (
-          <CustomFormFieldWithOutSpan
-            label="Industry"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
-        ) }
-
-        { popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY && (
-          <CustomFormFieldWithOutSpan
-            label="Description"
-            placeholder=""
-          ></CustomFormFieldWithOutSpan>
         ) }
 
         {/* Action Buttons */ }

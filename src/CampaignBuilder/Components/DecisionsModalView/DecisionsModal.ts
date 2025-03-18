@@ -44,8 +44,7 @@ const contactDecisions = [
   "Sends a whatsappbot message",
   "Sends a whatsapp message",
   "Submits form",
-  "Visits a page",
-  "Device visit"
+  "Visits a page"
 ];
 
 const categories = {
@@ -68,6 +67,11 @@ const categories = {
   selectMessage:["Stage 1", "Stage 2", "Stage 3", "Stage 4"],
   selectAMarketingMessage:["Stage 1", "Stage 2", "Stage 3", "Stage 4"],
 };
+
+// Actions
+const actionsCategories = {
+  sendEmailToUser: ["Click Here, Click Here", "Admin, Airtel", "ops, tech"]
+}
 
 const contactConditions: string[] = [
   "Contact campaigns",
@@ -198,6 +202,7 @@ const getPopUpHeaderText = (popupType: string) => {
 export {
   contactDecisions,
   categories,
+  actionsCategories,
   getPopUpHeaderText,
   contactConditions
 };
