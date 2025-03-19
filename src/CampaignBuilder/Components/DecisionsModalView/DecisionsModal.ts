@@ -12,7 +12,8 @@ interface CustomFormFieldProps {
 interface MultiSelectFieldProps {
     label: string;
     categoryKey: string;
-    selectedItems: Record<string, string[]>; // Generic object with string arrays
+    maxWidth?: string;
+    selectedItems: Record<string, string[]>;
     handleSelect: (categoryKey: string, value: string) => void;
     handleRemove: (categoryKey: string, value: string) => void;
     options: string[];

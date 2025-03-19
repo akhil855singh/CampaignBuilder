@@ -377,6 +377,7 @@ const DecisionsModalView = ({
           handleRemove={ handleActionRemove }
           options={ actionsCategories.sendEmailToUser }
           showspan={ true }
+          maxWidth="250"
         />
         <Box mt={ 4 }>
           <CustomFieldSwitchButton label="Send email to contact's owner" />
@@ -509,8 +510,9 @@ const DecisionsModalView = ({
     handleRemove,
     options,
     showspan,
+    maxWidth = "full"
   }) => (
-    <FormControl maxW="250" mt={ 4 }>
+    <FormControl maxW={ maxWidth } mt={ 4 }>
       <FormLabel fontSize={ 14 } color="black">
         { label }
         { showspan && (
@@ -1721,6 +1723,289 @@ const DecisionsModalView = ({
                 />
               </>
             ) }
+
+            {/* Device Type Selection */ }
+            { popupType === ConditionsTypes.CONTACT_DEVICE && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <MultiSelectField
+                  label="Device type"
+                  categoryKey="deviceTypes"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceTypes }
+                  showspan={ false }
+                />
+                <MultiSelectField
+                  label="Device brand"
+                  categoryKey="deviceBrands"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceBrands }
+                  showspan={ false }
+                />
+                <MultiSelectField
+                  label="Device OS"
+                  categoryKey="deviceOS"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceOS }
+                  showspan={ false }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_FIELD_VALUE && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <SingleSelect
+                  label="Contact Field"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <CustomFormField
+                  label="Value"
+                  placeholder=""
+                  labelColor="red"
+                  icon="*"
+                />
+                <SingleSelect
+                  label="Operator"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_OWNER && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <MultiSelectField
+                  label="Contact Owner"
+                  categoryKey="deviceOS"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceOS }
+                  showspan={ false }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_POINTS && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <SingleSelect
+                  label="Operator"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <CustomFormField
+                  label="Score"
+                  labelColor="red"
+                  icon="*"
+                  placeholder=""
+                />
+                <SingleSelect
+                  label="Point group"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_SEGMENTS && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <MultiSelectField
+                  label="Segments"
+                  categoryKey="deviceOS"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceOS }
+                  showspan={ false }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_STAGES && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <MultiSelectField
+                  label="Stage"
+                  categoryKey="deviceOS"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceOS }
+                  showspan={ false }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_TAGS && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <MultiSelectField
+                  label="Tags"
+                  categoryKey="deviceOS"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceOS }
+                  showspan={ false }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.FORM_FIELD_VALUE && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <SingleSelect
+                  label="Limit to forms"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <SingleSelect
+                  label="Operator"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <SingleSelect
+                  label="Field"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <CustomFormField
+                  label="Value"
+                  placeholder=""
+                  labelColor="red"
+                  icon="*"
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.HAS_ACTIVE_NOTIFICATION && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.HAS_VALID_EMAIL_ADDRESS && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.MARKED_AS_DNC && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <MultiSelectField
+                  label="Channels"
+                  categoryKey="deviceOS"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceOS }
+                  showspan={ false }
+                />
+                <SingleSelect
+                  label="Reason"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.VISITED_PAGE && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <CustomFormField
+                  label="Page Url"
+                  placeholder="http://"
+                />
+                <SingleSelect
+                  label="Page"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <CustomForlFieldDateTime
+                  label="Start Date"
+                  inputType="datetime-local"
+                />
+                <CustomForlFieldDateTime
+                  label="End Date"
+                  inputType="datetime-local"
+                />
+                <CustomFormField
+                  label="Time spent (seconds)"
+                  placeholder="0"
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.VISITED_PAGE && (
+              <>
+                <CustomFormFieldWithWeekdays />
+                <CustomFormFieldWithTime />
+                <CustomFormFieldCheckMarkDays />
+                <SingleSelect
+                  label="Page"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <CustomForlFieldDateTime
+                  label="Start Date"
+                  inputType="datetime-local"
+                />
+                <CustomForlFieldDateTime
+                  label="End Date"
+                  inputType="datetime-local"
+                />
+                <CustomFormField
+                  label="Time spent (seconds)"
+                  placeholder="0"
+                />
+              </>
+            ) }
           </>
         ) }
 
@@ -2498,6 +2783,210 @@ const DecisionsModalView = ({
                 onChange={ (value) => console.log("Selected:", value) }
               />
             ) }
+
+            {/* Device Type Selection */ }
+            { popupType === ConditionsTypes.CONTACT_DEVICE && (
+              <>
+                <MultiSelectField
+                  label="Device type"
+                  categoryKey="deviceTypes"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceTypes }
+                  showspan={ false }
+                />
+                <MultiSelectField
+                  label="Device brand"
+                  categoryKey="deviceBrands"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceBrands }
+                  showspan={ false }
+                />
+                <MultiSelectField
+                  label="Device OS"
+                  categoryKey="deviceOS"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceOS }
+                  showspan={ false }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_FIELD_VALUE && (
+              <>
+                <SingleSelect
+                  label="Contact Field"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <CustomFormField
+                  label="Value"
+                  placeholder=""
+                  labelColor="red"
+                  icon="*"
+                />
+                <SingleSelect
+                  label="Operator"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_OWNER && (
+              <MultiSelectField
+                label="Contact Owner"
+                categoryKey="deviceOS"
+                selectedItems={ selectedItems }
+                handleSelect={ handleSelect }
+                handleRemove={ handleRemove }
+                options={ categories.deviceOS }
+                showspan={ false }
+              />
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_POINTS && (
+              <>
+                <SingleSelect
+                  label="Operator"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <CustomFormField
+                  label="Score"
+                  labelColor="red"
+                  icon="*"
+                  placeholder=""
+                />
+                <SingleSelect
+                  label="Point group"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_SEGMENTS && (
+
+              <MultiSelectField
+                label="Segments"
+                categoryKey="deviceOS"
+                selectedItems={ selectedItems }
+                handleSelect={ handleSelect }
+                handleRemove={ handleRemove }
+                options={ categories.deviceOS }
+                showspan={ false }
+              />
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_STAGES && (
+              <MultiSelectField
+                label="Stage"
+                categoryKey="deviceOS"
+                selectedItems={ selectedItems }
+                handleSelect={ handleSelect }
+                handleRemove={ handleRemove }
+                options={ categories.deviceOS }
+                showspan={ false }
+              />
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_TAGS && (
+              <MultiSelectField
+                label="Tags"
+                categoryKey="deviceOS"
+                selectedItems={ selectedItems }
+                handleSelect={ handleSelect }
+                handleRemove={ handleRemove }
+                options={ categories.deviceOS }
+                showspan={ false }
+              />
+            ) }
+
+            { popupType === ConditionsTypes.FORM_FIELD_VALUE && (
+              <>
+                <SingleSelect
+                  label="Limit to forms"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <SingleSelect
+                  label="Operator"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <SingleSelect
+                  label="Field"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <CustomFormField
+                  label="Value"
+                  placeholder=""
+                  labelColor="red"
+                  icon="*"
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.MARKED_AS_DNC && (
+              <>
+                <MultiSelectField
+                  label="Channels"
+                  categoryKey="deviceOS"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceOS }
+                  showspan={ false }
+                />
+                <SingleSelect
+                  label="Reason"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.VISITED_PAGE && (
+              <>
+                <CustomFormField
+                  label="Page Url"
+                  placeholder="https://"
+                />
+                <SingleSelect
+                  label="Page"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <CustomForlFieldDateTime
+                  label="Start Date"
+                  inputType="datetime-local"
+                />
+                <CustomForlFieldDateTime
+                  label="End Date"
+                  inputType="datetime-local"
+                />
+                <CustomFormField
+                  label="Time spent (seconds)"
+                  placeholder="0"
+                />
+              </>
+            ) }
           </>
         ) }
 
@@ -2549,11 +3038,9 @@ const DecisionsModalView = ({
                   labelColor="red"
                   icon="*"
                 ></CustomFormField>
-
                 <Box mt={ 4 }>
                   {/* Filter Toggle */ }
                   <CustomFieldSwitchButton label="Filter by date added to campaign" />
-
                   {/* Conditional Fields */ }
                   { filterEnabled && (
                     <>
@@ -2564,7 +3051,6 @@ const DecisionsModalView = ({
                         placeholder="Choose one..."
                         onChange={ (value) => console.log("Selected:", value) }
                       />
-
                       {/* Date Input */ }
                       <CustomForlFieldDateTime
                         label="Date"
@@ -3314,7 +3800,6 @@ const DecisionsModalView = ({
                 ></CustomFormFieldWithOutSpan>
               </>
             ) }
-
             { (popupType === ActionsTypes.UPDATE_CONTACT_PRIMARY_COMPANY) && (
               <>
                 <CustomForlFieldDateTime
@@ -3395,6 +3880,270 @@ const DecisionsModalView = ({
                   options={ categories.selectMessage }
                   placeholder="Search Option..."
                   onChange={ (value) => console.log("Selected:", value) }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_DEVICE && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <MultiSelectField
+                  label="Device type"
+                  categoryKey="deviceTypes"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceTypes }
+                  showspan={ false }
+                />
+                <MultiSelectField
+                  label="Device brand"
+                  categoryKey="deviceBrands"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceBrands }
+                  showspan={ false }
+                />
+                <MultiSelectField
+                  label="Device OS"
+                  categoryKey="deviceOS"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceOS }
+                  showspan={ false }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_FIELD_VALUE && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <SingleSelect
+                  label="Contact Field"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <CustomFormField
+                  label="Value"
+                  placeholder=""
+                  labelColor="red"
+                  icon="*"
+                />
+                <SingleSelect
+                  label="Operator"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_OWNER && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <MultiSelectField
+                  label="Contact Owner"
+                  categoryKey="deviceOS"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceOS }
+                  showspan={ false }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_POINTS && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <SingleSelect
+                  label="Operator"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <CustomFormField
+                  label="Score"
+                  labelColor="red"
+                  icon="*"
+                  placeholder=""
+                />
+                <SingleSelect
+                  label="Point group"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_SEGMENTS && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <MultiSelectField
+                  label="Segments"
+                  categoryKey="deviceOS"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceOS }
+                  showspan={ false }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_STAGES && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <MultiSelectField
+                  label="Stage"
+                  categoryKey="deviceOS"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceOS }
+                  showspan={ false }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.CONTACT_TAGS && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <MultiSelectField
+                  label="Tags"
+                  categoryKey="deviceOS"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceOS }
+                  showspan={ false }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.FORM_FIELD_VALUE && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <SingleSelect
+                  label="Limit to forms"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <SingleSelect
+                  label="Operator"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <SingleSelect
+                  label="Field"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <CustomFormField
+                  label="Value"
+                  placeholder=""
+                  labelColor="red"
+                  icon="*"
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.HAS_ACTIVE_NOTIFICATION && (
+              <CustomForlFieldDateTime
+                label="Date"
+                inputType="datetime-local"
+              />
+            ) }
+
+            { popupType === ConditionsTypes.HAS_VALID_EMAIL_ADDRESS && (
+              <CustomForlFieldDateTime
+                label="Date"
+                inputType="datetime-local"
+              />
+            ) }
+
+            { popupType === ConditionsTypes.MARKED_AS_DNC && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <MultiSelectField
+                  label="Channels"
+                  categoryKey="deviceOS"
+                  selectedItems={ selectedItems }
+                  handleSelect={ handleSelect }
+                  handleRemove={ handleRemove }
+                  options={ categories.deviceOS }
+                  showspan={ false }
+                />
+                <SingleSelect
+                  label="Reason"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+              </>
+            ) }
+
+            { popupType === ConditionsTypes.VISITED_PAGE && (
+              <>
+                <CustomForlFieldDateTime
+                  label="Date"
+                  inputType="datetime-local"
+                />
+                <CustomFormField
+                  label="Page Url"
+                  placeholder="https://"
+                />
+                <SingleSelect
+                  label="Page"
+                  options={ ["Select", "less than"] }
+                  placeholder="Choose one..."
+                  onChange={ (value) => console.log("Selected:", value) }
+                />
+                <CustomForlFieldDateTime
+                  label="Start Date"
+                  inputType="datetime-local"
+                />
+                <CustomForlFieldDateTime
+                  label="End Date"
+                  inputType="datetime-local"
+                />
+                <CustomFormField
+                  label="Time spent (seconds)"
+                  placeholder="0"
                 />
               </>
             ) }
